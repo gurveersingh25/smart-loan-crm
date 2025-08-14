@@ -3,7 +3,15 @@ Flask-WTF
 Flask-SQLAlchemy
 Flask-Bcrypt
 Flask-Login
+Flask-Migrate
 email_validator
 joblib
 scikit-learn
+pandas
+numpy
+xgboost
+lightgbm
+shap
 gunicorn
+python-dotenv
+requests
