@@ -6,3 +6,4 @@ Flask-Login
 email_validator
 joblib
 scikit-learn
+gunicorn
