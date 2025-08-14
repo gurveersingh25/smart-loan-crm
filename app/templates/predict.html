@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% block title %}Loan Prediction - Smart Loan{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="text-center mb-12 animate-fade-in">
+            <div class="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 animate-float">
+                <i class="fas fa-brain text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <span class="gradient-text">AI-Powered</span> Default Risk Assessment
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Instantly assess the likelihood of loan default using advanced machine learning trained on real financial data.
+            </p>
+        </div>
+
+        <!-- Prediction Form -->
+        <div class="card-modern rounded-3xl p-8 mb-8 animate-slide-in-left">
+            <form method="POST" class="space-y-8" novalidate>
+                {{ form.hidden_tag() }}
+
+                <!-- Form Header -->
+                <div class="text-center pb-6 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Loan Application Details</h2>
+                    <p class="text-gray-600">Provide accurate borrower and loan information to assess default risk precisely.
+
+</p>
+                </div>
+
+                <!-- Form Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Business Type -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Business Type</label>
+                        {{ form.business(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Jobs Retained -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Jobs Retained</label>
+                        {{ form.jobs_reatained(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter number of jobs retained") }}
+                    </div>
+
+                    <!-- Jobs Created -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Jobs Created</label>
+                        {{ form.jobs_created(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter number of jobs created") }}
+                    </div>
+
+                    <!-- Guaranteed Loan -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Guaranteed Loan(in Rs.)</label> 
+                        {{ form.guaranteed_approved__loan(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Low Documentation -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Low Documentation</label>
+                        {{ form.low_documentation_loan(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Demography -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Demography</label>
+                        {{ form.demography(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Bank State -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Bank State</label>
+                        {{ form.state_of_bank(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Charged-Off Amount -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Charged-Off Amount(in Rs.)</label>
+                        {{ form.chargedoff_amount(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter charged-off amount") }}
+                    </div>
+
+                    <!-- Borrower City -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Borrower City</label>
+                        {{ form.borrower_city(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Borrower State -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Borrower State</label>
+                        {{ form.borrower_state(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Gross Amount Balance -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Gross Amount Balance(in Rs.)</label>
+                        {{ form.gross_amount_balance(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter gross amount balance") }}
+                    </div>
+
+                    <!-- Number of Employees -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Number of Employees</label>
+                        {{ form.count_employees(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter number of employees") }}
+                    </div>
+
+                    <!-- Classification Code -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Classification Code</label>
+                        {{ form.classification_code(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter classification code") }}
+                    </div>
+
+                    <!-- Loan Approved Gross -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Loan Approved Gross(in Rs.)</label>
+                        {{ form.loan_approved_gross(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter loan approved gross") }}
+                    </div>
+
+                    <!-- Gross Amount Disbursed -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Gross Amount Disbursed(in Rs.)</label>
+                        {{ form.gross_amount_disbursed(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter gross amount disbursed") }}
+                    </div>
+
+                    <!-- Term (Months) -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Term (Months)</label>
+                        {{ form.loan_term(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter loan term in months") }}
+                    </div>
+
+                    <!-- Franchise Code -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Franchise Code</label>
+                        {{ form.code_franchise(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl", placeholder="Enter franchise code") }}
+                    </div>
+
+                    <!-- Bank Name -->
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Bank Name</label>
+                        {{ form.name_of_bank(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+
+                    <!-- Revolving Credit -->
+                    <div class="form-group md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-900 mb-3">Revolving Credit</label>
+                        {{ form.revolving_credit_line(class="form-input w-full px-4 py-4 border border-gray-300 rounded-xl") }}
+                    </div>
+        
+
+
+                    <!-- Submit Button -->
+                    <div class="form-group md:col-span-2 pt-8 flex flex-col items-center justify-center text-center">
+                        {{ form.submit(class="predict-btn btn-gradient text-white px-12 py-4 rounded-2xl font-bold text-lg hover-lift btn-ripple transition-all duration-300 shadow-lg") }}
+                        <p class="text-sm text-gray-500 mt-4">
+                            <i class="fas fa-lock mr-1"></i>
+                            Your information is secure and encrypted
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+        <!-- Prediction Result -->
+        {% if prediction is defined %}
+        <div class="card-modern rounded-3xl p-8 animate-slide-in-right">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-slow">
+                    <i class="fas fa-check-circle text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Prediction Complete!</h3>
+                <div class="bg-gradient-to-r from-green-100 to-blue-100 border border-green-200 rounded-2xl p-6 mb-6">
+                    <div class="text-lg font-semibold text-gray-900 mb-2">Prediction Result:</div>
+                    <div class="text-2xl font-bold text-green-700">{{ prediction }}</div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <a href="{{ url_for('routes.prediction_history') }}" 
+                       class="flex items-center justify-center px-6 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl font-medium transition-all duration-300 hover-lift">
+                        <i class="fas fa-history mr-2"></i>
+                        View History
+                    </a>
+                    <button onclick="location.reload()" 
+                            class="flex items-center justify-center px-6 py-3 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl font-medium transition-all duration-300 hover-lift">
+                        <i class="fas fa-redo mr-2"></i>
+                        New Prediction
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Information Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div class="card-modern rounded-2xl p-6 text-center animate-on-scroll">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-robot text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">AI-Powered</h3>
+                <p class="text-gray-600 text-sm">Advanced machine learning models evaluate borrower risk with precision.</p>
+            </div>
+
+            <div class="card-modern rounded-2xl p-6 text-center animate-on-scroll">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-bolt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Instant Results</h3>
+                <p class="text-gray-600 text-sm">Instantly predict the likelihood of loan default no waiting, no guesswork.</p>
+            </div>
+
+            <div class="card-modern rounded-2xl p-6 text-center animate-on-scroll">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Secure & Private</h3>
+                <p class="text-gray-600 text-sm">All borrower data is encrypted and protected to meet financial compliance standards.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Helper to show field-specific error
+    function showFieldError(field, message) {
+        let errorEl = field.parentElement.querySelector('.error-message');
+        if (!errorEl) {
+            errorEl = document.createElement('p');
+            errorEl.className = 'error-message text-sm text-red-600 mt-2';
+            field.parentElement.appendChild(errorEl);
+        }
+        errorEl.textContent = message;
+        field.classList.add('border-red-500');
+    }
+
+    function clearFieldError(field) {
+        const errorEl = field.parentElement.querySelector('.error-message');
+        if (errorEl) errorEl.remove();
+        field.classList.remove('border-red-500');
+    }
+
+    // Main validation logic
+    function validateField(field) {
+        const value = field.value.trim();
+        const name = field.name;
+        let isValid = true;
+
+        clearFieldError(field);
+
+        if (!value) {
+            showFieldError(field, `${field.name.replace('_', ' ')} is required`);
+            return false;
+        }
+
+        // Additional validations based on field
+        if (['loan_amount', 'borrower_income'].includes(name)) {
+            const numValue = parseFloat(value.replace(/,/g, ''));
+            if (isNaN(numValue) || numValue <= 0) {
+                showFieldError(field, `${field.name.replace('_', ' ')} must be a positive number`);
+                return false;
+            }
+        }
+
+        return isValid;
+    }
+
+    // Real-time validation
+    document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('blur', () => validateField(input));
+        input.addEventListener('input', () => clearFieldError(input));
+    });
+
+    // Form submission validation
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const submitBtn = document.querySelector('.predict-btn');
+        let allValid = true;
+
+        document.querySelectorAll('.form-input').forEach(input => {
+            if (!validateField(input)) allValid = false;
+        });
+
+        if (!allValid) {
+            e.preventDefault();
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading-spinner mr-2"></div>Analyzing...';
+        submitBtn.classList.add('animate-pulse');
+    });
+
+</script>
+{% endblock %}
+
+{% endblock %}  

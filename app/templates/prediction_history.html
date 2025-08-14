@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}Prediction History - Smart Loan{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if predictions %}
+
+        <!-- Filters + Export Buttons -->
+        <div class="card-modern rounded-3xl p-6 mb-8 animate-on-scroll">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div class="flex space-x-3">
+                    <button id="exportBtn" type="button"
+                            class="flex items-center px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl font-medium transition-all duration-300 hover-lift">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                    <a href="{{ url_for('routes.predict_loan') }}"
+                       class="flex items-center px-4 py-2 btn-gradient text-white rounded-xl font-medium hover-lift transition-all duration-300">
+                        <i class="fas fa-plus mr-2"></i>New Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions List -->
+        <div class="space-y-6 animate-on-scroll" id="predictionsList">
+            {% for prediction in predictions %}
+            <div class="prediction-item card-modern rounded-2xl p-6 hover-lift transition-all duration-300"
+                 data-result="{{ prediction.result }}"
+                 data-score="{{ prediction.score }}"
+                 data-date="{{ prediction.created_at.isoformat() }}">
+
+                {% set input_dict = prediction.input_data | from_json %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="font-medium text-gray-700 mb-1">Business Type</div>
+                        <div class="text-gray-900">{{ input_dict.get('business', 'N/A') }}</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="font-medium text-gray-700 mb-1">Jobs Retained</div>
+                        <div class="text-gray-900">{{ input_dict.get('jobs_reatained', 'N/A') }}</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="font-medium text-gray-700 mb-1">Jobs Created</div>
+                        <div class="text-gray-900">{{ input_dict.get('jobs_created', 'N/A') }}</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="font-medium text-gray-700 mb-1">Loan Approved (₹)</div>
+                        <div class="text-gray-900">{{ input_dict.get('loan_approved_gross', 'N/A') }}</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="font-medium text-gray-700 mb-1">Charged-off Amount (₹)</div>
+                        <div class="text-gray-900">{{ input_dict.get('chargedoff_amount', 'N/A') }}</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="font-medium text-gray-700 mb-1">Loan Term (months)</div>
+                        <div class="text-gray-900">{{ input_dict.get('loan_term', 'N/A') }}</div>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-gray-500 mt-10">No predictions found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const resultFilter = document.getElementById('resultFilter');
+    const sortBy = document.getElementById('sortBy');
+    const predictionsList = document.getElementById('predictionsList');
+    const predictionItems = document.querySelectorAll('.prediction-item');
+
+    function filterAndSort() {
+        const searchTerm = searchInput?.value.toLowerCase() || "";
+        const resultFilterValue = resultFilter?.value || "";
+        const sortValue = sortBy?.value || "newest";
+
+        let visibleItems = Array.from(predictionItems).filter(item => {
+            const result = item.dataset.result;
+            const text = item.textContent.toLowerCase();
+            const matchesSearch = text.includes(searchTerm);
+            const matchesFilter = !resultFilterValue || result === resultFilterValue;
+            return matchesSearch && matchesFilter;
+        });
+
+        visibleItems.sort((a, b) => {
+            const dateA = new Date(a.dataset.date);
+            const dateB = new Date(b.dataset.date);
+            const scoreA = parseFloat(a.dataset.score);
+            const scoreB = parseFloat(b.dataset.score);
+
+            switch(sortValue) {
+                case 'oldest': return dateA - dateB;
+                case 'score-high': return scoreB - scoreA;
+                case 'score-low': return scoreA - scoreB;
+                default: return dateB - dateA;
+            }
+        });
+
+        predictionItems.forEach(item => item.style.display = 'none');
+        visibleItems.forEach((item, index) => {
+            item.style.display = 'block';
+            item.style.order = index;
+        });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterAndSort);
+    if (resultFilter) resultFilter.addEventListener('change', filterAndSort);
+    if (sortBy) sortBy.addEventListener('change', filterAndSort);
+
+    document.querySelectorAll('.stat-card').forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('animate-slide-in-left');
+        }, index * 100);
+    });
+
+    predictionItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            item.style.transform = 'translateY(-2px) scale(1.01)';
+        });
+        item.addEventListener('mouseleave', () => {
+            item.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', function () {
+        const csvContent = "data:text/csv;charset=utf-8,Date,Result,Score\n" +
+            Array.from(predictionItems).map(item => {
+                const date = new Date(item.dataset.date).toLocaleDateString();
+                const result = item.dataset.result;
+                const score = (parseFloat(item.dataset.score) * 100).toFixed(0);
+                return `${date},${result},${score}%`;
+            }).join('\n');
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'loan_predictions.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
+{% endblock %}

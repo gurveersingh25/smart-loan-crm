@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% block title %}User Dashboard - Smart Loan{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="mb-12 animate-fade-in">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                        Welcome back, <span class="animate-pulse-slow">{{ current_user.username }}!</span>
+                    </h1>
+                    <p class="text-xl text-blue-100 mb-6">
+                        Your loan risk dashboard is ready.... dive in to review predictions, analyze borrower trends, and make data-driven decisions with confidence.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+                            <span class="text-sm text-blue-100">Member since</span>
+                            <div class="font-semibold">{{ current_user.created_at.strftime('%B %Y') }}</div>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+                            <span class="text-sm text-blue-100">Account type</span>
+                            <div class="font-semibold capitalize">{{ current_user.role }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Floating background elements -->
+                <div class="absolute top-4 right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-float"></div>
+                <div class="absolute bottom-4 left-4 w-24 h-24 bg-purple-300/20 rounded-full blur-xl animate-float" style="animation-delay: 1s;"></div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12 animate-on-scroll">
+            <div class="stat-card card-modern rounded-2xl p-6 text-center hover-lift">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check-circle text-white text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 mb-1">{{ current_user.predictions|length }}</div>
+                <div class="text-gray-600">Total Predictions</div>
+            </div>
+            
+            <div class="stat-card card-modern rounded-2xl p-6 text-center hover-lift">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-chart-line text-white text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 mb-1">
+                    {{ (not_likely_default / total_predictions * 100) | round | int if total_predictions > 0 else 0 }}%
+                </div>
+                <div class="text-gray-600">Approval Rate</div>
+            </div>
+            
+            <div class="stat-card card-modern rounded-2xl p-6 text-center hover-lift">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-white text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 mb-1">
+                    {% if current_user.predictions %}
+                        {{ (current_user.predictions[-1].created_at.date() - current_user.created_at.date()).days }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </div>
+                <div class="text-gray-600">Days Active</div>
+            </div>
+            
+            <div class="stat-card card-modern rounded-2xl p-6 text-center hover-lift">
+                <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-star text-white text-2xl"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-900 mb-1">Premium</div>
+                <div class="text-gray-600">Account Status</div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Main Features -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Quick Actions -->
+                <div class="card-modern rounded-3xl p-8 animate-on-scroll">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Loan Prediction -->
+                        <div class="group feature-card bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 hover-lift transition-all duration-300 cursor-pointer border border-green-100 hover:border-green-300">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-brain text-white"></i>
+                                </div>
+                                <i class="fas fa-arrow-right text-green-500 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Loan Prediction</h3>
+                            <p class="text-gray-600 text-sm mb-4">Use AI to assess a borrower's likelihood of default based on real-time financial inputs.</p>
+                            <a href="{{ url_for('routes.predict_loan') }}" class="inline-flex items-center text-green-600 font-medium hover:text-green-700">
+                                Predict Now
+                                <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
+
+                        <!-- CRM Access -->
+                        <div class="group feature-card bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 hover-lift transition-all duration-300 cursor-pointer border border-blue-100 hover:border-blue-300">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-users text-white"></i>
+                                </div>
+                                <i class="fas fa-arrow-right text-blue-500 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">CRM Tools</h3>
+                            <p class="text-gray-600 text-sm mb-4">Manage customer relationships and communication effectively</p>
+                            <a href="{{ url_for('routes.crm_view') }}" class="inline-flex items-center text-blue-600 font-medium hover:text-blue-700">
+                                Access CRM
+                                <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
+
+                        <!-- Loan Application -->
+                        <div class="group feature-card bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 hover-lift transition-all duration-300 cursor-pointer border border-yellow-100 hover:border-yellow-300">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-file-alt text-white"></i>
+                                </div>
+                                <i class="fas fa-arrow-right text-yellow-500 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Apply for Loan</h3>
+                            <p class="text-gray-600 text-sm mb-4">Submit a new loan application with our streamlined process</p>
+                            <a href="{{ url_for('routes.apply_loan') }}" class="inline-flex items-center text-yellow-600 font-medium hover:text-yellow-700">
+                                Apply Now
+                                <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
+
+                        <!-- History -->
+                        <div class="group feature-card bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 hover-lift transition-all duration-300 cursor-pointer border border-purple-100 hover:border-purple-300">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-history text-white"></i>
+                                </div>
+                                <i class="fas fa-arrow-right text-purple-500 group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">View History</h3>
+                            <p class="text-gray-600 text-sm mb-4">Track your past predictions and application status</p>
+                            <a href="{{ url_for('routes.prediction_history') }}" class="inline-flex items-center text-purple-600 font-medium hover:text-purple-700">
+                                View History
+                                <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card-modern rounded-3xl p-8 animate-on-scroll">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">Recent Activity</h2>
+                        <a href="{{ url_for('routes.prediction_history') }}" class="text-blue-600 hover:text-blue-700 font-medium">View All</a>
+                    </div>
+                    
+                    {% if current_user.predictions %}
+                        <div class="space-y-4">
+                            {% for prediction in current_user.predictions[-3:] %}
+                            <div class="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center mr-4
+                                    {% if prediction.result == 'Approved' %}bg-green-100 text-green-600{% else %}bg-red-100 text-red-600{% endif %}">
+                                    <i class="fas {% if prediction.result == 'Approved' %}fa-check{% else %}fa-times{% endif %}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">Loan Prediction {{ prediction.result }}</div>
+                                    <div class="text-sm text-gray-500">{{ prediction.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold 
+                                        {% if prediction.result == 'Approved' %}text-green-600{% else %}text-red-600{% endif %}">
+                                        {{ (prediction.score * 100)|round|int }}%
+                                    </div>
+                                    <div class="text-xs text-gray-500">Confidence</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-12">
+                            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-chart-line text-gray-400 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No activity yet</h3>
+                            <p class="text-gray-600 mb-6">Start by making your first loan prediction</p>
+                            <a href="{{ url_for('routes.predict_loan') }}" class="btn-gradient text-white px-6 py-3 rounded-xl font-medium hover-lift">
+                                Make Prediction
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column - Sidebar -->
+            <div class="space-y-8">
+                <!-- Profile Summary -->
+                <div class="card-modern rounded-3xl p-6 animate-on-scroll">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Profile Summary</h3>
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-2xl font-bold">{{ current_user.username[0]|upper }}</span>
+                        </div>
+                        <h4 class="font-semibold text-gray-900">{{ current_user.username }}</h4>
+                        <p class="text-gray-600 text-sm">{{ current_user.email }}</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Account Status</span>
+                            <span class="text-green-600 font-medium">Active</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Member Since</span>
+                            <span class="font-medium">{{ current_user.created_at.strftime('%b %Y') }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Role</span>
+                            <span class="font-medium capitalize">{{ current_user.role }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-xl transition-colors">
+                            <i class="fas fa-cog mr-2"></i>Account Settings
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Tips -->
+                <div class="card-modern rounded-3xl p-6 animate-on-scroll">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">💡 Quick Tips</h3>
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                            <div class="font-medium text-blue-900 mb-1">Focus on Low-Risk Profiles</div>
+                            <p class="text-blue-700 text-sm">Prioritize applicants flagged as Not Likely to Default to maintain portfolio quality.</p>
+                        </div>
+                        
+                        <div class="bg-green-50 border border-green-100 rounded-xl p-4">
+                            <div class="font-medium text-green-900 mb-1">Monitor High-Risk Segments</div>
+                            <p class="text-green-700 text-sm">For Likely to Default cases, consider stricter terms, additional guarantees, or loan restructuring options.</p>
+                        </div>
+                        
+                        <div class="bg-purple-50 border border-purple-100 rounded-xl p-4">
+                            <div class="font-medium text-purple-900 mb-1">Leverage Prediction Trends</div>
+                            <p class="text-purple-700 text-sm">Use the AI’s historical prediction patterns to spot emerging risk clusters in borrower demographics or industries.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div class="card-modern rounded-3xl p-6 animate-on-scroll">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Need Help?</h3>
+                    <div class="space-y-3">
+                        <a href="#" class="flex items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-book text-blue-500 mr-3"></i>
+                            <span class="text-gray-700">Documentation</span>
+                        </a>
+                        <a href="#" class="flex items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-headset text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Live Support</span>
+                        </a>
+                        <a href="#" class="flex items-center p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                            <i class="fas fa-envelope text-purple-500 mr-3"></i>
+                            <span class="text-gray-700">Contact Us</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Animate stats counters
+    document.querySelectorAll('.stat-card').forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('animate-slide-in-left');
+        }, index * 100);
+    });
+
+    // Feature card interactions
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+        
+        card.addEventListener('click', function() {
+            const link = this.querySelector('a');
+            if (link) {
+                window.location.href = link.href;
+            }
+        });
+    });
+
+    // Initialize tooltips for profile section
+    const profileElements = document.querySelectorAll('[data-tooltip]');
+    profileElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip-custom';
+            tooltip.textContent = this.getAttribute('data-tooltip');
+            document.body.appendChild(tooltip);
+            
+            const rect = this.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + 'px';
+            
+            setTimeout(() => tooltip.classList.add('show'), 10);
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            const tooltip = document.querySelector('.tooltip-custom');
+            if (tooltip) {
+                tooltip.classList.remove('show');
+                setTimeout(() => tooltip.remove(), 150);
+            }
+        });
+    });
+
+    // Add loading states to action buttons
+    document.querySelectorAll('a[href*="predict"], a[href*="apply"]').forEach(link => {
+        link.addEventListener('click', function() {
+            this.innerHTML = '<div class="loading-spinner mr-2"></div>' + this.textContent;
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

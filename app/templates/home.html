@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% block title %}Home - Smart Loan CRM{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden py-20 lg:py-32">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center animate-fade-in">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6">
+                    Welcome to 
+                    <span class="gradient-text animate-pulse-slow">Smart Loan</span>
+                    <br>+ CRM System
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto animate-slide-in-left stagger-1">
+                    Built for loan officers and analysts, SmartLoan helps you predict defaults accurately, manage risk efficiently, and make better lending decisions.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-in-right stagger-2">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('routes.user_dashboard') }}" class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold text-lg hover-lift btn-ripple">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Go to Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('routes.register') }}" class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold text-lg hover-lift btn-ripple">
+                            <i class="fas fa-rocket mr-2"></i>Get Started
+                        </a>
+                        <a href="{{ url_for('routes.login') }}" class="bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all duration-300 hover-lift">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Floating elements -->
+            <div class="absolute top-10 left-10 w-20 h-20 bg-blue-400/20 rounded-full blur-xl animate-float"></div>
+            <div class="absolute top-20 right-20 w-32 h-32 bg-purple-400/20 rounded-full blur-xl animate-float" style="animation-delay: 1s;"></div>
+            <div class="absolute bottom-10 left-1/4 w-16 h-16 bg-indigo-400/20 rounded-full blur-xl animate-float" style="animation-delay: 2s;"></div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white/50 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    Essential Features for
+                    <span class="gradient-text">Smarter Loan Risk Management</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Focused tools designed to help financial professionals assess risk, prevent defaults, and make faster, data-driven lending decisions.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1: Loan Prediction -->
+                <div class="group card-modern rounded-2xl p-8 hover-lift animate-on-scroll stagger-child">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-brain text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">AI Loan Prediction</h3>
+                    <p class="text-gray-600 mb-6">
+                        Accurately predict loan default risk using real borrower and business data. Built on advanced machine learning models.
+                    </p>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('routes.predict_loan') }}" class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                            Predict Now <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('routes.login') }}" class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                            Try it Free <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Feature 2: Prediction History -->
+                <div class="group card-modern rounded-2xl p-8 hover-lift animate-on-scroll stagger-child">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-history text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Prediction History</h3>
+                    <p class="text-gray-600 mb-6">
+                        Instantly review and analyze all past loan predictions with outcomes, risk scores, and approval patterns.
+                    </p>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('routes.prediction_history') }}" class="inline-flex items-center text-green-600 font-semibold hover:text-green-700 transition-colors">
+                            View History <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    {% else %}
+                        <span class="inline-flex items-center text-gray-400 font-semibold">
+                            Login Required <i class="fas fa-lock ml-2"></i>
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Feature 3: Analytics -->
+                <div class="group card-modern rounded-2xl p-8 hover-lift animate-on-scroll stagger-child">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-chart-line text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Advanced Analytics</h3>
+                    <p class="text-gray-600 mb-6">
+                        Gain valuable insights with comprehensive dashboards, trend analysis, and real-time reporting capabilities.
+                    </p>
+                    <span class="inline-flex items-center text-purple-600 font-semibold">
+                        Coming Soon <i class="fas fa-clock ml-2"></i>
+                    </span>
+                </div>
+
+                <!-- Feature 4: User Management -->
+                <div class="group card-modern rounded-2xl p-8 hover-lift animate-on-scroll stagger-child">
+                    <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-users-cog text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">User Management</h3>
+                    <p class="text-gray-600 mb-6">
+                        Role-based user management with detailed activity logs and permissions to protect sensitive loan data.
+                    </p>
+                    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                        <a href="{{ url_for('routes.admin_dashboard') }}" class="inline-flex items-center text-orange-600 font-semibold hover:text-orange-700 transition-colors">
+                            Admin Panel <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    {% else %}
+                        <span class="inline-flex items-center text-gray-400 font-semibold">
+                            Admin Only <i class="fas fa-shield-alt ml-2"></i>
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Feature 5: CRM Tools -->
+                <div class="group card-modern rounded-2xl p-8 hover-lift animate-on-scroll stagger-child">
+                    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-handshake text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">CRM Integration</h3>
+                    <p class="text-gray-600 mb-6">
+                        Track client interactions, manage leads, and keep borrower communication organized in one place.
+                    </p>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('routes.crm_view') }}" class="inline-flex items-center text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
+                            Explore CRM <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    {% else %}
+                        <span class="inline-flex items-center text-gray-400 font-semibold">
+                            Login Required <i class="fas fa-lock ml-2"></i>
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Feature 6: Security -->
+                <div class="group card-modern rounded-2xl p-8 hover-lift animate-on-scroll stagger-child">
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Enterprise Security</h3>
+                    <p class="text-gray-600 mb-6">
+                        Bank-grade security with end-to-end encryption, secure data storage, and compliance with financial data privacy standards.
+                    </p>
+                    <span class="inline-flex items-center text-pink-600 font-semibold">
+                        Always Active <i class="fas fa-check-circle ml-2"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Trusted by Banking Professionals</h2>
+                <p class="text-xl text-blue-100">Backed by data. Built for accuracy. Used by loan officers to make faster, smarter decisions.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+                <div class="animate-on-scroll stagger-child">
+                    <div class="text-4xl md:text-5xl font-bold mb-2 animate-pulse-slow">93.5%</div>
+                    <p class="text-blue-100">Prediction Accuracy</p>
+                </div>
+                <div class="animate-on-scroll stagger-child">
+                    <div class="text-4xl md:text-5xl font-bold mb-2 animate-pulse-slow">50k+</div>
+                    <p class="text-blue-100">Loans Processed</p>
+                </div>
+                <div class="animate-on-scroll stagger-child">
+                    <div class="text-4xl md:text-5xl font-bold mb-2 animate-pulse-slow">500+</div>
+                    <p class="text-blue-100">Banking Officers Onboarded</p>
+                </div>
+                <div class="animate-on-scroll stagger-child">
+                    <div class="text-4xl md:text-5xl font-bold mb-2 animate-pulse-slow">24/7</div>
+                    <p class="text-blue-100">Support Available</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    {% if not current_user.is_authenticated %}
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="glass-morphism rounded-3xl p-12 animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                    Ready to Transform Your 
+                    <span class="gradient-text">Loan Defaults Smarter?</span>
+                </h2>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Empower your loan officers with data-driven insights and reduce default risks across every application.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{{ url_for('routes.register') }}" class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold text-lg hover-lift btn-ripple">
+                        <i class="fas fa-rocket mr-2"></i>Start Free Trial
+                    </a>
+                    <a href="#" class="bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all duration-300 hover-lift">
+                        <i class="fas fa-phone mr-2"></i>Schedule Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

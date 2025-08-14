@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- User Info Section -->
+<div class="mb-12 animate-fade-in px-4 md:px-12">
+  <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white relative overflow-hidden">
+    <div class="relative z-10">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4">Welcome back, {{ user.username }}!</h2>
+      <p class="text-lg text-blue-100 mb-6">Here's a quick overview of loan assessments </p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+          <span class="text-sm text-blue-100">Name</span>
+          <div class="font-semibold">{{ user.username }}</div>
+        </div>
+        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+          <span class="text-sm text-blue-100">Email</span>
+          <div class="font-semibold">{{ user.email }}</div>
+        </div>
+        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+          <span class="text-sm text-blue-100">Role</span>
+          <div class="font-semibold capitalize">{{ user.role }}</div>
+        </div>
+        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+          <span class="text-sm text-blue-100">Joined On</span>
+          <div class="font-semibold">{{ user.created_at.strftime('%B %d, %Y') }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="absolute top-4 right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-float"></div>
+    <div class="absolute bottom-4 left-4 w-24 h-24 bg-purple-300/20 rounded-full blur-xl animate-float" style="animation-delay: 1s;"></div>
+  </div>
+</div>
+
+<!-- Stats Section -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 px-4 md:px-12">
+  <div class="bg-white rounded-2xl p-6 shadow-xl transform transition-transform duration-300 hover:scale-105">
+    <h3 class="text-xl font-semibold text-gray-700">Total Predictions</h3>
+    <p class="text-3xl font-bold text-blue-600 mt-2">{{ total_predictions }}</p>
+  </div>
+  <div class="bg-white rounded-2xl p-6 shadow-xl transform transition-transform duration-300 hover:scale-105">
+    <h3 class="text-xl font-semibold text-gray-700">Likely to Default</h3>
+    <p class="text-3xl font-bold text-red-500 mt-2">{{ chart_values[0] }}</p>
+  </div>
+  <div class="bg-white rounded-2xl p-6 shadow-xl transform transition-transform duration-300 hover:scale-105">
+    <h3 class="text-xl font-semibold text-gray-700">Not Likely to Default</h3>
+    <p class="text-3xl font-bold text-green-500 mt-2">{{ chart_values[1] }}</p>
+  </div>
+</div>
+
+<!-- Pie Chart -->
+<div class="max-w-2xl mx-auto bg-white rounded-2xl p-6 shadow-xl mb-12 animate-slide-up px-4 md:px-12">
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Prediction Overview</h3>
+  <div class="relative h-64">
+    <canvas id="predictionPieChart"></canvas>
+  </div>
+</div>
+
+<!-- Predictions Table -->
+<div class="bg-white rounded-2xl p-6 shadow-2xl transform transition-transform duration-500 hover:scale-[1.02] animate-slide-up px-4 md:px-12">
+  <h3 class="text-xl font-semibold text-gray-800 mb-6">Prediction History</h3>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for prediction in predictions %}
+        <tr class="hover:bg-gray-100 transition duration-300">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loop.index }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium {% if prediction.result.lower() == 'likely to default' %}text-red-600{% else %}text-green-600{% endif %}">{{ prediction.result }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ prediction.score or 'N/A' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ prediction.created_at.strftime('%Y-%m-%d') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('predictionPieChart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: {{ chart_labels|tojson }},
+      datasets: [{
+        data: {{ chart_values|tojson }},
+        backgroundColor: ['#EF4444', '#10B981'],
+        borderColor: ['#991B1B', '#065F46'], 
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          enabled: true
+        }
+      },
+      animation: {
+        animateRotate: true,
+        animateScale: true
+      }
+    }
+  });
+</script>
+
+{% endblock %}

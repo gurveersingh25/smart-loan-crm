@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}Login - Smart Loan{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <!-- Header -->
+        <div class="text-center mb-8 animate-fade-in">
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
+                <i class="fas fa-sign-in-alt text-white text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+            <p class="text-gray-600">Sign in to your SmartLoan CRM account</p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="card-modern rounded-2xl p-8 animate-slide-in-left">
+            <form method="POST" class="space-y-6" novalidate>
+                {{ form.hidden_tag() }}
+                
+                <!-- Email Field -->
+                <div class="form-floating relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-gray-400"></i>
+                    </div>
+                    <input 
+                        id="email" 
+                        name="email" 
+                        type="email" 
+                        class="peer form-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 placeholder-transparent" 
+                        placeholder="Email"
+                        required
+                    >
+                    <label for="email" class="absolute left-10 top-3 text-gray-500 text-sm transition-all duration-200 bg-white px-1">
+                        Email Address
+                    </label>
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback text-red-500 text-sm mt-1">
+                            {% for error in form.email.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-floating relative">
+
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input 
+                        id="password" 
+                        name="password" 
+                        type="password" 
+                        class="peer password-input form-input w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300" 
+                        placeholder=" "
+                        required
+                    >
+                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password">
+                        <i class="fas fa-eye text-gray-400 hover:text-gray-600 transition-colors"></i>
+                    </button>
+                    <label for="password" class="password-label absolute left-10 top-3 text-gray-500 text-sm transition-all duration-200 bg-white px-1">
+                        Password
+                    </label>
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback text-red-500 text-sm mt-1">
+                            {% for error in form.password.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                        <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                    </label>
+                    <a href="#" class="text-sm text-blue-600 hover:text-blue-500 transition-colors">
+                        Forgot password?
+                    </a>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    {{ form.submit(class="w-full btn-gradient text-white py-3 px-4 rounded-xl font-semibold text-lg hover-lift btn-ripple transition-all duration-300") }}
+                </div>
+
+                <!-- Divider -->
+                <!--<div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                    </div>
+                </div>-->
+
+                <!-- Social Login Buttons -->
+                <!--<div class="grid grid-cols-2 gap-3">
+                    <button type="button" class="flex justify-center items-center px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover-lift transition-all duration-300">
+                        <i class="fab fa-google text-red-500 mr-2"></i>
+                        Google
+                    </button>
+                    <button type="button" class="flex justify-center items-center px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover-lift transition-all duration-300">
+                        <i class="fab fa-microsoft text-blue-500 mr-2"></i>
+                        Microsoft
+                    </button>
+                </div>-->
+            </form>
+        </div>
+
+        <!-- Sign Up Link -->
+        <div class="text-center mt-6 animate-slide-in-right">
+            <p class="text-gray-600">
+                Don't have an account? 
+                <a href="{{ url_for('routes.register') }}" class="text-blue-600 hover:text-blue-500 font-semibold transition-colors">
+                    Create one now <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </p>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="mt-8 text-center text-sm text-gray-500 animate-fade-in">
+            <i class="fas fa-shield-alt mr-1"></i>
+            Your data is protected with bank-grade security
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Handle password label floating state properly
+    const passwordInput = document.querySelector('.password-input');
+    const passwordLabel = document.querySelector('.password-label');
+
+    function updatePasswordLabel() {
+        if (passwordInput.value.trim() !== '' || passwordInput === document.activeElement) {
+            passwordLabel.classList.add('!top-[-0.75rem]', '!text-sm', '!text-blue-500');
+        } else {
+            passwordLabel.classList.remove('!top-[-0.75rem]', '!text-sm', '!text-blue-500');
+        }
+    }
+
+    passwordInput.addEventListener('focus', updatePasswordLabel);
+    passwordInput.addEventListener('blur', updatePasswordLabel);
+    passwordInput.addEventListener('input', updatePasswordLabel);
+
+// Run on page load in case browser autofills
+document.addEventListener('DOMContentLoaded', updatePasswordLabel);
+
+    // Toggle password visibility
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function () {
+            const passwordField = this.parentElement.querySelector('input');
+            const icon = this.querySelector('i');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+
+    // Floating label fix (manual transform)
+    document.querySelectorAll('.form-floating').forEach(container => {
+    const input = container.querySelector('input');
+    const label = container.querySelector('label');
+
+    function updateLabel() {
+        if (input.value.trim() !== '' || input === document.activeElement) {
+            label.classList.add('!top-[-0.75rem]', '!text-sm', '!text-blue-500');
+        } else {
+            label.classList.remove('!top-[-0.75rem]', '!text-sm', '!text-blue-500');
+        }
+    }
+
+    input.addEventListener('focus', updateLabel);
+    input.addEventListener('blur', updateLabel);
+    input.addEventListener('input', updateLabel);
+    updateLabel();
+    });
+   
+</script>
+{% endblock %}
+{% endblock %}

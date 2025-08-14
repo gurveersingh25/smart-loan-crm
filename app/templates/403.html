@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block title %}Access Denied - Smart Loan{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl w-full text-center">
+        <!-- Animated Error Icon -->
+        <div class="mb-8 animate-fade-in">
+            <div class="w-32 h-32 bg-gradient-to-br from-red-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-float">
+                <i class="fas fa-shield-alt text-red-500 text-5xl animate-pulse-slow"></i>
+            </div>
+        </div>
+
+        <!-- Error Code -->
+        <div class="mb-8 animate-slide-in-left">
+            <h1 class="text-8xl md:text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-4">
+                403
+            </h1>
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Access Denied</h2>
+            <p class="text-xl text-gray-600 max-w-lg mx-auto">
+                You don't have permission to access this resource. This area is restricted to authorized users only.
+            </p>
+        </div>
+
+        <!-- Security Information -->
+        <div class="card-modern rounded-3xl p-8 mb-8 animate-slide-in-right">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-shield text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Authentication Required</h3>
+                    <p class="text-sm text-gray-600">You need to be logged in with proper credentials</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-key text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Insufficient Privileges</h3>
+                    <p class="text-sm text-gray-600">Your account doesn't have the required permissions</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lock text-white text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Secure Access</h3>
+                    <p class="text-sm text-gray-600">This ensures your data and our system remain protected</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('routes.user_dashboard') }}" 
+                   class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold text-lg hover-lift btn-ripple transition-all duration-300">
+                    <i class="fas fa-tachometer-alt mr-2"></i>Go to Dashboard
+                </a>
+                
+                <button onclick="requestAccess()" 
+                        class="bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-blue-300 hover:text-blue-600 transition-all duration-300 hover-lift">
+                    <i class="fas fa-envelope mr-2"></i>Request Access
+                </button>
+            {% else %}
+                <a href="{{ url_for('routes.login') }}" 
+                   class="btn-gradient text-white px-8 py-4 rounded-xl font-semibold text-lg hover-lift btn-ripple transition-all duration-300">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </a>
+                
+                <a href="{{ url_for('routes.register') }}" 
+                   class="bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-green-300 hover:text-green-600 transition-all duration-300 hover-lift">
+                    <i class="fas fa-user-plus mr-2"></i>Create Account
+                </a>
+            {% endif %}
+            
+            <a href="{{ url_for('routes.home') }}" 
+               class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover-lift">
+                <i class="fas fa-home mr-2"></i>Go Home
+            </a>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-12 animate-on-scroll">
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Need Help?</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onclick="contactSupport()" 
+                            class="flex items-center justify-center p-3 bg-white hover:bg-gray-50 rounded-xl transition-colors group">
+                        <i class="fas fa-headset text-blue-500 mr-2 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-gray-700 font-medium">Contact Support</span>
+                    </button>
+                    
+                    <button onclick="viewDocumentation()" 
+                            class="flex items-center justify-center p-3 bg-white hover:bg-gray-50 rounded-xl transition-colors group">
+                        <i class="fas fa-book text-purple-500 mr-2 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-gray-700 font-medium">View Documentation</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="mt-8 text-center text-sm text-gray-500 animate-fade-in">
+            <i class="fas fa-info-circle mr-1"></i>
+            This incident has been logged for security purposes. 
+            <span class="font-medium">Error Code: 403-{{ range(1000, 9999) | random }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Request Access Modal -->
+<div id="requestModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 animate-fade-in">
+        <div class="text-center">
+            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-paper-plane text-blue-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Request Access</h3>
+            <p class="text-gray-600 mb-6">
+                Explain why you need access to this resource and we'll review your request.
+            </p>
+            <div class="space-y-4">
+                <textarea id="accessReason" rows="4"
+                          placeholder="Please describe why you need access to this area..."
+                          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none"></textarea>
+                <div class="flex space-x-3">
+                    <button onclick="closeRequestModal()" 
+                            class="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="submitAccessRequest()" 
+                            class="flex-1 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors">
+                        Send Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Request access functionality
+    function requestAccess() {
+        document.getElementById('requestModal').classList.remove('hidden');
+        document.getElementById('requestModal').classList.add('flex');
+    }
+
+    function closeRequestModal() {
+        document.getElementById('requestModal').classList.add('hidden');
+        document.getElementById('requestModal').classList.remove('flex');
+    }
+
+    function submitAccessRequest() {
+        const reason = document.getElementById('accessReason').value.trim();
+        
+        if (!reason) {
+            alert('Please provide a reason for your access request.');
+            return;
+        }
+        
+        // Here you would typically send the request to your backend
+        alert('Your access request has been submitted and will be reviewed by our team. You will receive an email notification regarding the status of your request.');
+        closeRequestModal();
+        document.getElementById('accessReason').value = '';
+    }
+
+    // Support functions
+    function contactSupport() {
+        alert('Our support team is available 24/7. You can reach us at:\n\nEmail: support@smartloan.com\nPhone: 1-800-SMART-LOAN\nChat: Available on our website');
+    }
+
+    function viewDocumentation() {
+        alert('Documentation and user guides are available in our help center. You can access them from the main navigation menu or contact support for specific guidance.');
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeRequestModal();
+        }
+    });
+
+    // Close modal on backdrop click
+    //document.getElementById('requestModal').addEventListener('click',{% extends 'base.html' %}

@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Welcome, {{ session['user'] }}</h2>
+    <p>This is the dashboard page.</p>
+    <a href="{{ url_for('routes.logout') }}">Logout</a>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Loan + CRM{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 2s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/animations.css') }}" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .navbar-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .tooltip-custom {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: all 0.15s ease;
+            pointer-events: none;
+        }
+        
+        .tooltip-custom.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .page-loading {
+            overflow: hidden;
+        }
+        
+        .page-loading::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            z-index: 9999;
+            animation: loading-bar 1s linear infinite;
+        }
+        
+        @keyframes loading-bar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="navbar-glass sticky top-0 z-50 animate-fade-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{{ url_for('routes.home') }}" class="flex items-center space-x-3 hover:scale-105 transition-transform duration-300">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">SmartLoan CRM</span>
+                    </a>
+                </div>
+                
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('routes.user_dashboard') }}" class="nav-link text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300">
+                            <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                        </a>
+                        {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('routes.admin_dashboard') }}" class="nav-link text-gray-700 hover:text-purple-600 font-medium transition-colors duration-300">
+                                <i class="fas fa-users-cog mr-2"></i>Admin
+                            </a>
+                        {% endif %}
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm text-gray-600">Welcome, <span class="font-semibold">{{ current_user.username }}</span></span>
+                            <a href="{{ url_for('routes.logout') }}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:scale-105">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('routes.login') }}" class="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </a>
+                        <a href="{{ url_for('routes.register') }}" class="btn-gradient text-white px-6 py-2 rounded-lg font-medium btn-ripple">
+                            <i class="fas fa-user-plus mr-2"></i>Register
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button class="mobile-menu-btn text-gray-700 hover:text-blue-600 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 py-3 space-y-3">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('routes.user_dashboard') }}" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
+                    {% if current_user.role == 'admin' %}
+                        <a href="{{ url_for('routes.admin_dashboard') }}" class="block text-gray-700 hover:text-purple-600 font-medium">Admin</a>
+                    {% endif %}
+                    <a href="{{ url_for('routes.logout') }}" class="block text-red-600 font-medium">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('routes.login') }}" class="block text-gray-700 hover:text-blue-600 font-medium">Login</a>
+                    <a href="{{ url_for('routes.register') }}" class="block text-blue-600 font-medium">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed top-20 right-4 z-50 space-y-2">
+                {% for category, message in messages %}
+                    <div class="alert bg-white border-l-4 p-4 rounded-lg shadow-lg max-w-sm animate-slide-in-right
+                        {% if category == 'success' %}border-green-500 text-green-700{% endif %}
+                        {% if category == 'danger' %}border-red-500 text-red-700{% endif %}
+                        {% if category == 'info' %}border-blue-500 text-blue-700{% endif %}
+                        {% if category == 'warning' %}border-yellow-500 text-yellow-700{% endif %}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    {% if category == 'success' %}<i class="fas fa-check-circle text-green-500"></i>{% endif %}
+                                    {% if category == 'danger' %}<i class="fas fa-exclamation-circle text-red-500"></i>{% endif %}
+                                    {% if category == 'info' %}<i class="fas fa-info-circle text-blue-500"></i>{% endif %}
+                                    {% if category == 'warning' %}<i class="fas fa-exclamation-triangle text-yellow-500"></i>{% endif %}
+                                </div>
+                                <div class="ml-3">
+                                    <p class="font-medium">{{ message }}</p>
+                                </div>
+                            </div>
+                            <button type="button" class="ml-4 text-gray-400 hover:text-gray-600" onclick="this.parentElement.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="page-transition">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">SmartLoan CRM</span>
+                    </div>
+                    <p class="text-gray-600 max-w-md">
+                        Empowering loan officers with AI-driven default risk predictions and integrated borrower management tools.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-4">Features</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">Loan Prediction</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">CRM Tools</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">Analytics</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">Reports</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-4">Support</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-blue-600 transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 mt-8 pt-8 text-center text-gray-600">
+                <p>&copy; 2025 Smart Loan + CRM. All rights reserved. Built with ❤️ by Gurveer Singh.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/interactions.js') }}"></script>
+    
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+            const menu = document.querySelector('.mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

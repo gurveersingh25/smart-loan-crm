@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% block title %}Register - Smart Loan{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <!-- Header -->
+        <div class="text-center mb-8 animate-fade-in">
+            <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-float">
+                <i class="fas fa-user-plus text-white text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+            <p class="text-gray-600">Join SmartLoan CRM and start your journey</p>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="card-modern rounded-2xl p-8 animate-slide-in-left">
+            <form method="POST" class="space-y-6" novalidate>
+                {{ form.hidden_tag() }}
+                
+                <!-- Username Field -->
+                <div class="form-floating">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        {{ form.username(class="form-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300", placeholder=" ") }}
+                        <label class="absolute left-10 top-3 text-gray-500 transition-all duration-300 pointer-events-none">Username</label>
+                        <div class="username-check absolute inset-y-0 right-0 pr-3 flex items-center hidden">
+                            <i class="fas fa-check text-green-500"></i>
+                        </div>
+                    </div>
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback text-red-500 text-sm mt-1">
+                            {% for error in form.username.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="username-hint text-xs text-gray-500 mt-1">
+                        Must be 3-20 characters, letters and numbers only
+                    </div>
+                </div>
+
+                <!-- Email Field -->
+                <div class="form-floating">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        {{ form.email(class="form-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300", placeholder=" ") }}
+                        <label class="absolute left-10 top-3 text-gray-500 transition-all duration-300 pointer-events-none">Email Address</label>
+                        <div class="email-check absolute inset-y-0 right-0 pr-3 flex items-center hidden">
+                            <i class="fas fa-check text-green-500"></i>
+                        </div>
+                    </div>
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback text-red-500 text-sm mt-1">
+                            {% for error in form.email.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <!-- Password Field -->
+                <div class="form-floating relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    {{ form.password(id="password", type="password", class="peer form-input w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 placeholder-transparent", placeholder=" ") }}
+                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password">
+                        <i class="fas fa-eye text-gray-400 hover:text-gray-600 transition-colors"></i>
+                    </button>
+                    <label for="password" class="absolute left-10 top-3 text-gray-500 text-sm transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-[-0.75rem] peer-focus:text-sm peer-focus:text-blue-500 bg-white px-1">
+                        Password
+                    </label>
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback text-red-500 text-sm mt-1">
+                            {% for error in form.password.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Strength Indicator -->
+                <div class="password-strength mt-2">
+                    <div class="flex space-x-1">
+                        <div class="strength-bar w-1/4 h-1 bg-gray-200 rounded"></div>
+                        <div class="strength-bar w-1/4 h-1 bg-gray-200 rounded"></div>
+                        <div class="strength-bar w-1/4 h-1 bg-gray-200 rounded"></div>
+                        <div class="strength-bar w-1/4 h-1 bg-gray-200 rounded"></div>
+                    </div>
+                    <p class="strength-text text-xs text-gray-500 mt-1">Password strength</p>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="form-floating relative mt-4">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    {{ form.confirm_password(id="confirm_password", type="password", class="peer form-input w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 placeholder-transparent", placeholder=" ") }}
+                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password">
+                        <i class="fas fa-eye text-gray-400 hover:text-gray-600 transition-colors"></i>
+                    </button>
+                    <label for="confirm_password" class="absolute left-10 top-3 text-gray-500 text-sm transition-all duration-200 peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-[-0.75rem] peer-focus:text-sm peer-focus:text-blue-500 bg-white px-1">
+                        Confirm Password
+                    </label>
+                    {% if form.confirm_password.errors %}
+                        <div class="invalid-feedback text-red-500 text-sm mt-1">
+                            {% for error in form.confirm_password.errors %}
+                                <p><i class="fas fa-exclamation-circle mr-1"></i>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Terms and Privacy -->
+                <div class="flex items-start">
+                    <input type="checkbox" id="terms" required class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                    <label for="terms" class="ml-2 text-sm text-gray-600">
+                        I agree to the 
+                        <a href="#" class="text-blue-600 hover:text-blue-500 transition-colors">Terms of Service</a> 
+                        and 
+                        <a href="#" class="text-blue-600 hover:text-blue-500 transition-colors">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    {{ form.submit(class="w-full btn-gradient text-white py-3 px-4 rounded-xl font-semibold text-lg hover-lift btn-ripple transition-all duration-300") }}
+                </div>
+
+                <!-- Divider -->
+                <!--<div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">Or sign up with</span>
+                    </div>
+                </div>-->
+
+                <!-- Social Registration Buttons -->
+                <!--<div class="grid grid-cols-2 gap-3">
+                    <button type="button" class="flex justify-center items-center px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover-lift transition-all duration-300">
+                        <i class="fab fa-google text-red-500 mr-2"></i>
+                        Google
+                    </button>
+                    <button type="button" class="flex justify-center items-center px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover-lift transition-all duration-300">
+                        <i class="fab fa-microsoft text-blue-500 mr-2"></i>
+                        Microsoft
+                    </button>
+                </div>-->
+            </form>
+        </div>
+
+        <!-- Sign In Link -->
+        <div class="text-center mt-6 animate-slide-in-right">
+            <p class="text-gray-600">
+                Already have an account? 
+                <a href="{{ url_for('routes.login') }}" class="text-blue-600 hover:text-blue-500 font-semibold transition-colors">
+                    Sign in here <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </p>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="mt-8 text-center text-sm text-gray-500 animate-fade-in">
+            <i class="fas fa-shield-alt mr-1"></i>
+            Your data is protected with bank-grade security
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+
+    document.querySelectorAll('.form-floating').forEach(container => {
+        const input = container.querySelector('input');
+        const label = container.querySelector('label');
+
+        function updateLabel() {
+            if (input.value.trim() !== '' || input === document.activeElement) {
+                label.classList.add('!top-[-0.75rem]', '!text-sm', '!text-blue-500');
+            } else {
+                label.classList.remove('!top-[-0.75rem]', '!text-sm', '!text-blue-500');
+            }
+        }
+
+        input.addEventListener('focus', updateLabel);
+        input.addEventListener('blur', updateLabel);
+        input.addEventListener('input', updateLabel);
+        updateLabel();
+    });
+
+    // Password toggle functionality
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const passwordField = this.parentElement.querySelector('input[type="password"], input[type="text"]');
+            const icon = this.querySelector('i');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+
+    // Password strength checker
+    const registerPasswordField = document.querySelector('input[name="password"]');
+    const strengthBars = document.querySelectorAll('.strength-bar');
+    const strengthText = document.querySelector('.strength-text');
+
+    registerPasswordField.addEventListener('input', function() {
+        const password = this.value;
+        const strength = calculatePasswordStrength(password);
+        updatePasswordStrength(strength);
+    });
+
+    function calculatePasswordStrength(password) {
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^a-zA-Z0-9]/.test(password)) score++;
+        return Math.min(score, 4);
+    }
+
+    function updatePasswordStrength(strength) {
+        const colors = ['bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-green-400'];
+        const texts = ['Weak', 'Fair', 'Good', 'Strong'];
+        
+        strengthBars.forEach((bar, index) => {
+            bar.className = 'strength-bar w-1/4 h-1 rounded transition-colors duration-300';
+            if (index < strength) {
+                bar.classList.add(colors[strength - 1]);
+            } else {
+                bar.classList.add('bg-gray-200');
+            }
+        });
+        
+        if (strength > 0) {
+            strengthText.textContent = texts[strength - 1] + ' password';
+            strengthText.className = 'strength-text text-xs mt-1 text-' + 
+                ['red', 'orange', 'yellow', 'green'][strength - 1] + '-600';
+        } else {
+            strengthText.textContent = 'Password strength';
+            strengthText.className = 'strength-text text-xs text-gray-500 mt-1';
+        }
+    }
+
+    // Password match checker
+    const confirmPasswordField = document.querySelector('input[name="confirm_password"]');
+    const passwordMatch = document.querySelector('.password-match');
+
+    confirmPasswordField.addEventListener('input', function() {
+        if (this.value && passwordField.value === this.value) {
+            passwordMatch.classList.remove('hidden');
+            this.classList.add('border-green-500');
+            this.classList.remove('border-red-500');
+        } else if (this.value) {
+            passwordMatch.classList.add('hidden');
+            this.classList.add('border-red-500');
+            this.classList.remove('border-green-500');
+        } else {
+            passwordMatch.classList.add('hidden');
+            this.classList.remove('border-red-500', 'border-green-500');
+        }
+    });
+
+    // Real-time validation
+    const emailField = document.querySelector('input[name="email"]');
+    const emailCheck = document.querySelector('.email-check');
+    const usernameField = document.querySelector('input[name="username"]');
+    const usernameCheck = document.querySelector('.username-check');
+
+    // Email validation
+    emailField.addEventListener('blur', function() {
+        const email = this.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (email && emailRegex.test(email)) {
+            emailCheck.classList.remove('hidden');
+            this.classList.add('border-green-500');
+            this.classList.remove('border-red-500');
+        } else if (email) {
+            emailCheck.classList.add('hidden');
+            this.classList.add('border-red-500');
+            this.classList.remove('border-green-500');
+        } else {
+            emailCheck.classList.add('hidden');
+            this.classList.remove('border-red-500', 'border-green-500');
+        }
+    });
+
+    // Username validation
+    usernameField.addEventListener('blur', function() {
+        const username = this.value.trim();
+        const usernameRegex = /^[a-zA-Z0-9]{3,20}$/;
+        
+        if (username && usernameRegex.test(username)) {
+            usernameCheck.classList.remove('hidden');
+            this.classList.add('border-green-500');
+            this.classList.remove('border-red-500');
+        } else if (username) {
+            usernameCheck.classList.add('hidden');
+            this.classList.add('border-red-500');
+            this.classList.remove('border-green-500');
+        } else {
+            usernameCheck.classList.add('hidden');
+            this.classList.remove('border-red-500', 'border-green-500');
+        }
+    });
+
+    // Form submission
+    const registerForm = document.querySelector('form');
+    registerForm.addEventListener('submit', function(e) {
+        const terms = document.querySelector('#terms');
+        if (!terms.checked) {
+            e.preventDefault();
+            alert('Please accept the Terms of Service and Privacy Policy');
+            return;
+        }
+        
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading-spinner mr-2"></div>Creating account...';
+    });
+
+</script>
+{% endblock %}
+{% endblock %}
