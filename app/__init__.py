@@ -15,8 +15,13 @@ login_manager.login_view = 'routes.login'
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+    app.config['SECRET_KEY'] = os.environ.get(
+    'SECRET_KEY',
+    '4810f5b06aae3d7b426d1537e6366e48'
+)
+
+    db_url = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 
     db.init_app(app)
     bcrypt.init_app(app)
