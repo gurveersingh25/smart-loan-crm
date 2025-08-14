@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_migrate import Migrate
 import json
+import os
 # Extensions
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -14,7 +15,7 @@ login_manager.login_view = 'routes.login'
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = '4810f5b06aae3d7b426d1537e6366e48'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
     db.init_app(app)
