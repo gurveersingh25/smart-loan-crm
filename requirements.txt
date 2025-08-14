@@ -6,7 +6,6 @@ Flask-Login
 Flask-Migrate
 email_validator
 joblib
-scikit-learn
 pandas
 numpy
 xgboost
@@ -15,3 +14,4 @@ shap
 gunicorn
 python-dotenv
 requests
+scikit-learn==1.6.1
