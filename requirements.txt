@@ -5,13 +5,6 @@ Flask-Bcrypt
 Flask-Login
 Flask-Migrate
 email_validator
-joblib
-pandas
-numpy
-xgboost
-lightgbm
-shap
 gunicorn
 python-dotenv
 requests
-scikit-learn==1.6.1
