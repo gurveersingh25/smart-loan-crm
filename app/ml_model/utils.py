@@ -1,46 +1,36 @@
-import numpy as np
-import pickle
-from sklearn.preprocessing import LabelEncoder
+import os
 import joblib
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+
 def safe_transform(encoder, val):
     try:
         return encoder.transform([val])[0]
     except ValueError:
         print(f"⚠️ Unseen label during transform: {val}")
-        return -1  # or any other dummy value your model can handle
+        return -1  # only safe if your model can handle it
 
 
+# ✅ Load encoders once, with absolute path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+encoder_path = os.path.join(BASE_DIR, "encoder_label.pkl")
 
-# Load encoders once (on app startup)
-with open("app/ml_model/encoder_label.pkl", "rb") as f:
-
+with open(encoder_path, "rb") as f:
     encoders = joblib.load(f)
+
 
 def decode_value(field_name, value, encoders):
     if not isinstance(encoders, dict):
         raise TypeError(f"[decode_value] encoders is not a dict, got {type(encoders)}")
 
-    """
-    Decode a label-encoded value back to its original string label
-    using the stored LabelEncoder from encoder_label.pkl.
-
-    Args:
-        field_name (str): The name of the feature column.
-        value (int/str): The encoded value.
-        encoders (dict): Dictionary of LabelEncoders.
-
-    Returns:
-        str: The original string label, or the raw value if decoding not possible.
-    """
-    
     encoder = encoders.get(field_name)
     if encoder:
         try:
             return encoder.inverse_transform([int(value)])[0]
         except Exception:
-            return f"Invalid ({value})"
-    return value  # If no encoder for that field, return as is
-    
+            return value  # fallback instead of "Invalid"
+    return value
+
 
 def preprocess_input(input_data: dict, encoders: dict, feature_order: list) -> list:
     processed = []
@@ -48,7 +38,6 @@ def preprocess_input(input_data: dict, encoders: dict, feature_order: list) -> l
     for feature in feature_order:
         raw_value = input_data.get(feature)
 
-        # If the field has an encoder
         if feature in encoders:
             encoder = encoders[feature]
             value = str(raw_value).strip() if isinstance(raw_value, str) else raw_value
@@ -57,11 +46,11 @@ def preprocess_input(input_data: dict, encoders: dict, feature_order: list) -> l
                 encoded_value = encoder.transform([value])[0]
             except ValueError:
                 print(f"⚠️ Unseen label during transform: {value}")
-                encoded_value = -1  # Unseen class
+                encoded_value = -1  # careful: only valid if model can handle
             processed.append(encoded_value)
 
         else:
-            # For numeric fields, handle missing or invalid data
+            # numeric fields
             if raw_value in [None, '', 'NaN']:
                 processed.append(0.0)
             else:
@@ -72,6 +61,3 @@ def preprocess_input(input_data: dict, encoders: dict, feature_order: list) -> l
                     processed.append(0.0)
 
     return processed
-
-
-
