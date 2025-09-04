@@ -1,8 +1,13 @@
-# 🚀 Smart Loan + CRM
+# 🌟 Smart Loan + CRM
 
 **Smart Loan + CRM** – An **intelligent loan management and decision-support system** that combines **Machine Learning**, **secure web interfaces**, and **database integration** to optimize loan officer operations and minimize financial risk.  
 
-**Live Demo:** [Try it here on Railway](https://web-production-368b.up.railway.app/) 🌐 
+---
+
+## 🚀 **[LIVE DEMO](https://web-production-368b.up.railway.app/)**
+
+**Note:** This project is designed for **training, educational, and practice purposes**. All debugging information and internal workflows are intentionally visible to help learners understand the system and interact with it safely. Sensitive production data is **not included**.
+
 
 ---
 
