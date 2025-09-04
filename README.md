@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 **[LIVE DEMO](https://web-production-368b.up.railway.app/)**
+## **🚀 LIVE DEMO:** [Click here to see the project in action!](https://web-production-368b.up.railway.app/)
 
 **Note:** This project is designed for **training, educational, and practice purposes**. All debugging information and internal workflows are intentionally visible to help learners understand the system and interact with it safely. Sensitive production data is **not included**.
 
