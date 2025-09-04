@@ -65,7 +65,7 @@ This platform allows:
 ---
 
 
-##📊 Prediction Flow
+## 📊 Prediction Flow
 
 1. **Input loan & borrower details**
 2. **ML model predicts default probability**
@@ -126,7 +126,7 @@ This platform allows:
 **Name:** Gurveer Singh  
 **Role:** Data Scientist & Full Stack Developer  
 **GitHub:** [https://github.com/gurveersingh25](https://github.com/gurveersingh25)  
-**LinkedIn:** [https://www.linkedin.com/in/gurveersingh25/](https://www.linkedin.com/in/gurveersingh25/)  
+**LinkedIn:** [https://www.linkedin.com/in/gurveersingh25/](https://www.linkedin.com/in/gurveer-singh-184627283/)  
 **Email:** indian.army25ff@gmail.com  
 
 **About the Author:**  
