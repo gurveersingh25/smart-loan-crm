@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Virtual env
+venv/
+.env/
+
+# Jupyter
+*.ipynb_checkpoints/
+
+# Databases
+instance/*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# ML artifacts (exclude local junk, but keep models tracked by LFS)
+*.joblib
+*.h5
+*.model
+
+# OS junk
+.DS_Store
+Thumbs.db
