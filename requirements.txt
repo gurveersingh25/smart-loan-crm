@@ -7,10 +7,9 @@ Flask-Migrate==4.0.5
 email_validator==2.1.1
 joblib==1.3.2
 scikit-learn==1.6.1
-pandas==2.2.2
+pandas==2.1.1
 gunicorn==23.0.0
 python-dotenv==1.0.1
 requests==2.32.3
 psycopg2-binary==2.9.9
-gdown
-psycopg2-binary
+gdown==4.7.1
