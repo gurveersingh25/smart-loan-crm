@@ -8,6 +8,7 @@ MODEL_PATH = "app/ml_model/mudra_model.pkl"
 
 def get_model():
     if not os.path.exists(MODEL_PATH):
+        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
         print("Downloading the model from Google Drive...")
         gdown.download(URL, MODEL_PATH, quiet=False)
     return joblib.load(MODEL_PATH)
