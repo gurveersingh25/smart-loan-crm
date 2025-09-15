@@ -1,25 +1,26 @@
 # app/ml_model/predict.py
 import pandas as pd
-import numpy as np
 import joblib
+import numpy as np
 import os
 from app.ml_model.utils import preprocess_input
-from app.ml_model.model_loader import get_model  # ✅ new import
+
 
 # Absolute paths for safe loading
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(BASE_DIR, 'mudra_model.pkl')
 encoder_path = os.path.join(BASE_DIR, 'encoder_label.pkl')
 feature_order_path = os.path.join(BASE_DIR, 'feature_order.pkl')
 
-# ✅ Use the wrapper to get model
-model = get_model()
-
-# Encoders + feature order (these are small, so you can keep them in Git)
-model_encoders = joblib.load(encoder_path)
+# Load model, encoders, and feature order
+# Load model, encoders, and feature order
+model = joblib.load(model_path)
+model_encoders = joblib.load(encoder_path)  # renamed to avoid collision
 feature_order = joblib.load(feature_order_path)
 
-encoders = model_encoders  # just an alias for readability
 
+
+encoders = model_encoders  # just an alias for readability
 def predict_loan_default(input_data: dict, model=model, model_encoders=model_encoders, feature_order=feature_order):
     print("🔹 RAW input_data:", input_data)
 
@@ -42,14 +43,15 @@ def predict_loan_default(input_data: dict, model=model, model_encoders=model_enc
         if col in model_encoders:
             encoder = model_encoders[col]
             try:
+                # If the value is already a category, pass as is
                 if isinstance(val, str):
                     decoded_inputs[col] = val
                 else:
                     decoded_inputs[col] = encoder.inverse_transform([val])[0]
-            except Exception:
-                decoded_inputs[col] = val
+            except Exception as e:
+                decoded_inputs[col] = val  # Fallback in case of error
         else:
-            decoded_inputs[col] = val
+            decoded_inputs[col] = val  # No decoding needed
 
     # Step 4: Return prediction and decoded inputs
     label = "Likely to Default" if prediction == 1 else "Not Likely to Default"
