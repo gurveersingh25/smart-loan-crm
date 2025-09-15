@@ -4,7 +4,7 @@
 
 ---
 
-## **🚀 LIVE DEMO:** [Click here to see the project in action!](https://web-production-368b.up.railway.app/)
+## **🚀 LIVE DEMO:** [Click here to see the project in action!](https://smart-loan-crm-9c860c8ee5b7.herokuapp.com/)
 
 **Note:** This project is designed for **training, educational, and practice purposes**. All debugging information and internal workflows are intentionally visible to help learners understand the system and interact with it safely. Sensitive production data is **not included**.
 
@@ -38,15 +38,13 @@ This platform allows:
 
 ## 🛠️ Technology Stack
 
-- **Backend:** FastAPI  
+- **Backend:** Flask  
 - **Frontend:** HTML + TailwindCSS  
-- **Database:** SQLite (`instance/site.db`)  
+- **Database:** Surpass (free version)  
 - **ML / AI:** Scikit-learn, joblib (RandomForestClassifier)  
-- **Security:** Role-based authentication (Admin/User)  
-- **Deployment:** Railway / any cloud host  
-- **Data Files:** Model & encoders hosted externally for easier deployment  
+- **Security:** Flask-Login, bcrypt; Role-based authentication (Admin/User)  
+- **Deployment:** Heroku (free tier)   
 
-> ⚠️ **Note:** The ML model (`mudra_model.pkl`) downloads automatically on first run. You don’t need to manually place it. Errors are logged clearly in the terminal for transparency.
 
 ---
 
@@ -80,10 +78,9 @@ This platform allows:
 
 ## 📂 Data Handling
 ---
-- All sensitive customer data is stored in `instance/site.db`  
-- ML artifacts (`mudra_model.pkl`) is downloaded externally to keep the repository light  
-- Label encoders ensure consistent categorical mapping  
-
+- All sensitive customer data is stored in Surpass (free version)  
+- ML artifacts (`mudra_model.pkl` and encoders) are stored locally in the repository  
+- Label encoders ensure consistent categorical mapping
 ---
 
 ## 🔧 Notes for Developers
