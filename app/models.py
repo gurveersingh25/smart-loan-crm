@@ -6,6 +6,7 @@ from app import bcrypt
 
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'  
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -15,7 +16,6 @@ class User(UserMixin, db.Model):
     
     predictions = db.relationship('Prediction', backref='user', lazy=True, cascade="all, delete-orphan")
 
-
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
@@ -24,8 +24,9 @@ class User(UserMixin, db.Model):
 
 
 class Prediction(db.Model):
+    __tablename__ = 'predictions'  # optional but cleaner
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # <- update here
     result = db.Column(db.String(100), nullable=False)
     score = db.Column(db.Float)
     input_data = db.Column(db.Text)
