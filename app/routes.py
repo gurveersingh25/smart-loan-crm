@@ -5,13 +5,15 @@ from app import db
 from .models import User, Prediction
 from .forms import LoginForm, RegisterForm, PredictionForm
 import random
-from app.ml_model.predict import predict_loan_default, get_model  # ✅ changed import
+from app.ml_model.predict import predict_loan_default, get_model 
 from app.ml_model.utils import decode_value
 import json
+from collections import defaultdict
+from datetime import datetime
 
 
 def get_encoder_choices(column_name):
-    _, model_encoders, _ = get_model()  # ✅ load encoders lazily
+    _, model_encoders, _ = get_model()  
     if column_name not in model_encoders:
         return []
     encoder = model_encoders[column_name]
@@ -184,9 +186,25 @@ def crm_view():
     likely_default = sum(1 for p in user_predictions if p.result.lower() == 'likely to default')
     not_likely_default = sum(1 for p in user_predictions if p.result.lower() == 'not likely to default')
 
-    # Add these two lines for Chart.js
+    # Pie chart data
     chart_labels = ['Likely to Default', 'Not Likely to Default']
     chart_values = [likely_default, not_likely_default]
+
+    # --- Line chart / trend data ---
+    # Group predictions by month
+    trend_counts = defaultdict(lambda: {'likely': 0, 'not_likely': 0})
+    for p in user_predictions:
+        month_label = p.created_at.strftime('%b %Y')  # e.g., 'Sep 2025'
+        if p.result.lower() == 'likely to default':
+            trend_counts[month_label]['likely'] += 1
+        else:
+            trend_counts[month_label]['not_likely'] += 1
+
+    # Sort months chronologically
+    sorted_months = sorted(trend_counts.keys(), key=lambda x: datetime.strptime(x, '%b %Y'))
+    trend_dates = sorted_months
+    trend_defaults = [trend_counts[m]['likely'] for m in sorted_months]
+    trend_nondefaults = [trend_counts[m]['not_likely'] for m in sorted_months]
 
     return render_template(
         'crm.html',
@@ -194,7 +212,10 @@ def crm_view():
         predictions=user_predictions,
         total_predictions=total_predictions,
         chart_labels=chart_labels,
-        chart_values=chart_values
+        chart_values=chart_values,
+        trend_dates=trend_dates,
+        trend_defaults=trend_defaults,
+        trend_nondefaults=trend_nondefaults
     )
 
 
