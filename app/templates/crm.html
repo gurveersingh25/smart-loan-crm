@@ -6,7 +6,7 @@
   <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 text-white relative overflow-hidden">
     <div class="relative z-10">
       <h2 class="text-2xl md:text-3xl font-bold mb-4">Hello <span class="animate-pulse-slow">{{ current_user.username }}</span>, here’s your complete loan assessment summary!</h2>
-      <p class="text-lg text-blue-100 mb-6">Here's a quick overview of loan assessments </p>
+      <p class="text-lg text-blue-100 mb-6">Your complete loan assessment dashboard at a glance</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
           <span class="text-sm text-blue-100">Name</span>
@@ -47,12 +47,25 @@
   </div>
 </div>
 
-<!-- Pie Chart -->
-<div class="max-w-2xl mx-auto bg-white rounded-2xl p-6 shadow-xl mb-12 animate-slide-up px-4 md:px-12">
-  <h3 class="text-xl font-semibold text-gray-800 mb-4">Prediction Overview</h3>
-  <div class="relative h-64">
-    <canvas id="predictionPieChart"></canvas>
+<!-- Charts Section Side by Side -->
+<div class="flex flex-col md:flex-row gap-6 mb-12 px-4 md:px-12">
+  
+  <!-- Pie Chart -->
+  <div class="flex-1 bg-white rounded-2xl p-6 shadow-xl animate-slide-up">
+    <h3 class="text-xl font-semibold text-gray-800 mb-4">Prediction Overview</h3>
+    <div class="relative h-64">
+      <canvas id="predictionPieChart"></canvas>
+    </div>
   </div>
+
+  <!-- Line Chart -->
+  <div class="flex-1 bg-white rounded-2xl p-6 shadow-xl animate-slide-up">
+    <h3 class="text-xl font-semibold text-gray-800 mb-4">Prediction Trends Over Time</h3>
+    <div class="relative h-64">
+      <canvas id="predictionTrendChart"></canvas>
+    </div>
+  </div>
+
 </div>
 
 <!-- Predictions Table -->
@@ -85,8 +98,9 @@
 <!-- Chart.js Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctx = document.getElementById('predictionPieChart').getContext('2d');
-  const chart = new Chart(ctx, {
+  // Pie Chart
+  const ctxPie = document.getElementById('predictionPieChart').getContext('2d');
+  const pieChart = new Chart(ctxPie, {
     type: 'pie',
     data: {
       labels: {{ chart_labels|tojson }},
@@ -100,18 +114,41 @@
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'bottom'
+      plugins: { legend: { position: 'bottom' }, tooltip: { enabled: true } },
+      animation: { animateRotate: true, animateScale: true }
+    }
+  });
+
+  // Line Chart: Prediction Trends Over Time
+  const ctxTrend = document.getElementById('predictionTrendChart').getContext('2d');
+  const trendChart = new Chart(ctxTrend, {
+    type: 'line',
+    data: {
+      labels: {{ trend_dates|tojson }},
+      datasets: [
+        {
+          label: 'Likely to Default',
+          data: {{ trend_defaults|tojson }},
+          borderColor: '#EF4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.2)',
+          fill: true,
+          tension: 0.3
         },
-        tooltip: {
-          enabled: true
+        {
+          label: 'Not Likely to Default',
+          data: {{ trend_nondefaults|tojson }},
+          borderColor: '#10B981',
+          backgroundColor: 'rgba(16, 185, 129, 0.2)',
+          fill: true,
+          tension: 0.3
         }
-      },
-      animation: {
-        animateRotate: true,
-        animateScale: true
-      }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' }, tooltip: { enabled: true } },
+      scales: { x: { ticks: { maxRotation: 45, minRotation: 30 } }, y: { beginAtZero: true } }
     }
   });
 </script>
