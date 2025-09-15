@@ -5,13 +5,13 @@ from app import db
 from .models import User, Prediction
 from .forms import LoginForm, RegisterForm, PredictionForm
 import random
-from app.ml_model.predict import model_encoders,feature_order
-from app.ml_model.predict import predict_loan_default
+from app.ml_model.predict import predict_loan_default, get_model  # ✅ changed import
 from app.ml_model.utils import decode_value
 import json
 
 
 def get_encoder_choices(column_name):
+    _, model_encoders, _ = get_model()  # ✅ load encoders lazily
     if column_name not in model_encoders:
         return []
     encoder = model_encoders[column_name]
@@ -70,7 +70,6 @@ def register():
         return redirect(url_for('routes.login'))
     
     return render_template('register.html', form=form)
-
 
 
 @bp.route('/logout')
@@ -133,6 +132,7 @@ def predict_loan():
         if form.validate_on_submit():
             print("✅ Form validated successfully")
 
+            _, _, feature_order = get_model()  # ✅ load feature order lazily
             input_data = {
                 field.name: field.data
                 for field in form if field.name in feature_order and field.data is not None
@@ -162,15 +162,6 @@ def predict_loan():
     )
 
 
-
-
-
-
-
-
-
-
-
 @bp.route('/history')
 @login_required
 def prediction_history():
@@ -182,7 +173,6 @@ def prediction_history():
 @login_required
 def apply_loan():
     return render_template('apply_loan.html')
-
 
 
 @bp.route('/crm')
@@ -206,10 +196,6 @@ def crm_view():
         chart_labels=chart_labels,
         chart_values=chart_values
     )
-
-
-
-
 
 
 @bp.route('/promote-user/<int:user_id>')
@@ -246,8 +232,6 @@ def delete_user(user_id):
     db.session.commit()
     flash(f'✅ User {user.username} deleted successfully', 'success')
     return redirect(url_for('routes.admin_dashboard'))
-
-
 
 
 @bp.errorhandler(403)
