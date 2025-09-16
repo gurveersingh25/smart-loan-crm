@@ -269,47 +269,46 @@
     </div>
 
     <script>
-        const currentLoanId = {{ loan.id if loan else 'null' }}; // Safe Jinja rendering
-        const input = document.getElementById('chatInput');
+    async function sendMessage() {
+        const messages = document.getElementById('chatMessages');
+        const msg = input.value.trim();
+        if (msg === '') return;
 
-        async function sendMessage() {
-            const messages = document.getElementById('chatMessages');
-            const msg = input.value.trim();
-            if (msg === '') return;
+        const userMsg = document.createElement('div');
+        userMsg.className = 'text-right mb-2';
+        userMsg.innerHTML = `<span class="inline-block bg-blue-100 text-blue-800 px-3 py-2 rounded-lg">${msg}</span>`;
+        messages.appendChild(userMsg);
+        messages.scrollTop = messages.scrollHeight;
+        input.value = '';
 
-            const userMsg = document.createElement('div');
-            userMsg.className = 'text-right mb-2';
-            userMsg.innerHTML = `<span class="inline-block bg-blue-100 text-blue-800 px-3 py-2 rounded-lg">${msg}</span>`;
-            messages.appendChild(userMsg);
-            messages.scrollTop = messages.scrollHeight;
-            input.value = '';
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'text-left mb-2';
+        aiMsg.innerHTML = `<span class="inline-block bg-gray-100 text-gray-800 px-3 py-2 rounded-lg">Processing...</span>`;
+        messages.appendChild(aiMsg);
+        messages.scrollTop = messages.scrollHeight;
 
-            const aiMsg = document.createElement('div');
-            aiMsg.className = 'text-left mb-2';
-            aiMsg.innerHTML = `<span class="inline-block bg-gray-100 text-gray-800 px-3 py-2 rounded-lg">Processing...</span>`;
-            messages.appendChild(aiMsg);
-            messages.scrollTop = messages.scrollHeight;
+        try {
+            const res = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg, loan_id: currentLoanId })
+            });
 
+            let data;
             try {
-                const res = await fetch('/api/ai/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: msg, loan_id: currentLoanId })
-                });
-                const data = await res.json();
-                typeWriterEffect(aiMsg, data.answer || "No answer received", 20);
-                messages.scrollTop = messages.scrollHeight;
-            } catch (err) {
-                aiMsg.innerHTML = `<span class="inline-block bg-red-100 text-red-800 px-3 py-2 rounded-lg">Error: ${err.message}</span>`;
+                data = await res.json(); // try parsing JSON
+            } catch (jsonErr) {
+                // fallback for HTML or invalid response
+                data = { answer: `Error: Unexpected response from server (${res.status})` };
             }
-        }
 
-        input.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                sendMessage();
-            }
-        });
-    </script>
+            typeWriterEffect(aiMsg, data.answer || "No answer received", 20);
+            messages.scrollTop = messages.scrollHeight;
+
+        } catch (err) {
+            aiMsg.innerHTML = `<span class="inline-block bg-red-100 text-red-800 px-3 py-2 rounded-lg">Error: ${err.message}</span>`;
+        }
+    }
+</script>
 </body>
 </html>
