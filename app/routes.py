@@ -171,10 +171,45 @@ def prediction_history():
     return render_template('prediction_history.html', predictions=predictions)
 
 
-@bp.route('/apply-loan')
+@bp.route('/flagged-loans')
 @login_required
-def apply_loan():
-    return render_template('apply_loan.html')
+def flagged_loans_view():
+    today = datetime.today()
+    week_ago = today - timedelta(days=7)
+
+    
+    flagged_loans = Prediction.query.filter_by(result="Likely to Default").all()
+
+    for loan in flagged_loans:
+
+        try:
+            loan.parsed_data = json.loads(loan.input_data)
+        except Exception:
+            loan.parsed_data = {}
+
+        
+        if not loan.created_at:
+            loan.created_at = datetime.utcnow()
+
+    flagged_count = len(flagged_loans)
+    flagged_today = (
+        Prediction.query.filter_by(result="Likely to Default")
+        .filter(Prediction.created_at >= datetime(today.year, today.month, today.day))
+        .count()
+    )
+    flagged_week = (
+        Prediction.query.filter_by(result="Likely to Default")
+        .filter(Prediction.created_at >= week_ago)
+        .count()
+    )
+
+    return render_template(
+        'flagged_loans.html',
+        flagged_loans=flagged_loans,
+        flagged_count=flagged_count,
+        flagged_today=flagged_today,
+        flagged_week=flagged_week
+    )
 
 
 @bp.route('/crm')
