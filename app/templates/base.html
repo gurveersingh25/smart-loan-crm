@@ -269,22 +269,34 @@
     </div>
 
    <script>
-    const input = document.getElementById('chatInput'); // top-level reference
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('chatInput');
+    if (!input) return; // safety check if chatInput isn't on the page
+
+    // Safely assign currentLoanId from server
+    const currentLoanId = {{ loan.id if loan else 'null' | tojson }};
 
     // Add Enter key support
     input.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
-            sendMessage(); // call the separate function
+            sendMessage();
         }
     });
+
+    // Send button listener
+    const sendBtn = input.nextElementSibling; // assumes button is next to input
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendMessage);
+    }
 
     // sendMessage function
     async function sendMessage() {
         const messages = document.getElementById('chatMessages');
         const msg = input.value.trim();
-        if (msg === '') return;
+        if (!msg) return;
 
+        // User message
         const userMsg = document.createElement('div');
         userMsg.className = 'text-right mb-2';
         userMsg.innerHTML = `<span class="inline-block bg-blue-100 text-blue-800 px-3 py-2 rounded-lg">${msg}</span>`;
@@ -292,12 +304,14 @@
         messages.scrollTop = messages.scrollHeight;
         input.value = '';
 
+        // AI placeholder
         const aiMsg = document.createElement('div');
         aiMsg.className = 'text-left mb-2';
         aiMsg.innerHTML = `<span class="inline-block bg-gray-100 text-gray-800 px-3 py-2 rounded-lg">Processing...</span>`;
         messages.appendChild(aiMsg);
         messages.scrollTop = messages.scrollHeight;
 
+        // Fetch AI response
         try {
             const res = await fetch('/api/ai/chat', {
                 method: 'POST',
@@ -319,6 +333,8 @@
             aiMsg.innerHTML = `<span class="inline-block bg-red-100 text-red-800 px-3 py-2 rounded-lg">Error: ${err.message}</span>`;
         }
     }
+});
 </script>
+
 </body>
 </html>
