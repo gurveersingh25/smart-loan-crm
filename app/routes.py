@@ -178,8 +178,10 @@ def flagged_loans_view():
     week_ago = today - timedelta(days=7)
 
     
-    flagged_loans = Prediction.query.filter_by(result="Likely to Default").all()
-
+    flagged_loans = Prediction.query.filter_by(
+        result="Likely to Default",
+        user_id=current_user.id  
+    ).all()
     for loan in flagged_loans:
 
         try:
