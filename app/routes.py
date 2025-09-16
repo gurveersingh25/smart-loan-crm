@@ -353,16 +353,29 @@ def delete_user(user_id):
 @bp.route('/api/ai/chat', methods=['POST'])
 @login_required
 def ai_chat():
-    data = request.get_json()
-    if not data or 'message' not in data:
-        return jsonify({'answer':'No message sent'}), 400
+    try:
+        data = request.get_json()
+        if not data or 'message' not in data:
+            return jsonify({'answer':'No message sent'}), 400
 
-    user_message = data['message']
-    loan_id = data.get('loan_id')
-    loan = Loan.query.get(loan_id) if loan_id else Loan.query.filter_by(officer_id=current_user.id).order_by(Loan.id.desc()).first()
+        user_message = data['message']
+        loan_id = data.get('loan_id')
 
-    answer = get_ai_answer(user_message=user_message, loan=loan, officer=current_user)
-    return jsonify({'answer': answer})
+        # Pick loan if ID provided, otherwise pick latest loan for this officer
+        loan = None
+        if loan_id:
+            loan = Loan.query.get(loan_id)
+        else:
+            # Make sure your Loan model actually links to officer/user
+            loan = Loan.query.filter_by(officer_id=current_user.id).order_by(Loan.id.desc()).first()
+
+        answer = get_ai_answer(user_message=user_message, loan=loan, officer=current_user)
+        return jsonify({'answer': answer})
+
+    except Exception as e:
+        # Always return JSON on error to prevent front-end crash
+        return jsonify({'answer': f'Error processing request: {str(e)}'}), 500
+
 
 
 @bp.errorhandler(403)
