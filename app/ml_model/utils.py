@@ -1,23 +1,22 @@
-import os
-import joblib
+# app/ml_model/utils.py
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
+import joblib
 
 def safe_transform(encoder, val):
+    """
+    Safely transform a value using LabelEncoder.
+    If the value is unseen, fallback to most common class seen during training.
+    """
     try:
         return encoder.transform([val])[0]
     except ValueError:
-        print(f"⚠️ Unseen label during transform: {val}")
-        return -1  # only safe if your model can handle it
+        most_common = encoder.classes_[0]  # fallback to first class from training
+        print(f"⚠️ Unseen label during transform: {val}. Using fallback: {most_common}")
+        return encoder.transform([most_common])[0]
 
-
-# ✅ Load encoders once, with absolute path
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-encoder_path = os.path.join(BASE_DIR, "encoder_label.pkl")
-
-with open(encoder_path, "rb") as f:
+# Load encoders once (on app startup)
+with open("app/ml_model/encoder_label.pkl", "rb") as f:
     encoders = joblib.load(f)
-
 
 def decode_value(field_name, value, encoders):
     if not isinstance(encoders, dict):
@@ -28,9 +27,8 @@ def decode_value(field_name, value, encoders):
         try:
             return encoder.inverse_transform([int(value)])[0]
         except Exception:
-            return value  # fallback instead of "Invalid"
-    return value
-
+            return f"Invalid ({value})"
+    return value  # If no encoder for that field, return as is
 
 def preprocess_input(input_data: dict, encoders: dict, feature_order: list) -> list:
     processed = []
@@ -38,19 +36,17 @@ def preprocess_input(input_data: dict, encoders: dict, feature_order: list) -> l
     for feature in feature_order:
         raw_value = input_data.get(feature)
 
+        # If the field has an encoder
         if feature in encoders:
             encoder = encoders[feature]
             value = str(raw_value).strip() if isinstance(raw_value, str) else raw_value
 
-            try:
-                encoded_value = encoder.transform([value])[0]
-            except ValueError:
-                print(f"⚠️ Unseen label during transform: {value}")
-                encoded_value = -1  # careful: only valid if model can handle
+            # Fixed: Use safe_transform to handle unseen labels
+            encoded_value = safe_transform(encoder, value)
             processed.append(encoded_value)
 
         else:
-            # numeric fields
+            # For numeric fields, handle missing or invalid data
             if raw_value in [None, '', 'NaN']:
                 processed.append(0.0)
             else:
