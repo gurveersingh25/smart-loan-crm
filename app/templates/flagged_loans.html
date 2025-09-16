@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Flagged Loans - Smart Loan{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8">
+  <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Officer Info -->
+    <div class="mb-12 animate-fade-in px-4 md:px-12">
+      <div class="bg-gradient-to-r from-red-600 to-pink-600 rounded-3xl p-8 text-white relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8">
+        <div class="relative z-10">
+          <h2 class="text-2xl md:text-3xl font-bold mb-4">Hello <span class="animate-pulse-slow">{{ current_user.username }}</span>, here are flagged loans that need your attention!</h2>
+          <p class="text-lg text-red-100 mb-6">Review and take action on these high-risk loans.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+              <span class="text-sm text-red-100">Total Flagged</span>
+              <div class="font-semibold">{{ flagged_count }}</div>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+              <span class="text-sm text-red-100">Today</span>
+              <div class="font-semibold">{{ flagged_today }}</div>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
+              <span class="text-sm text-red-100">This Week</span>
+              <div class="font-semibold">{{ flagged_week }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="absolute top-4 right-4 w-32 h-32 bg-white/10 rounded-full blur-2xl animate-float"></div>
+        <div class="absolute bottom-4 left-4 w-24 h-24 bg-pink-300/20 rounded-full blur-xl animate-float" style="animation-delay: 1s;"></div>
+      </div>
+    </div>
+
+    <!-- Filters + Export -->
+    <div class="card-modern rounded-3xl p-6 mb-8 animate-on-scroll">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+        <div class="flex space-x-3">
+          <button id="exportBtn" type="button"
+                  class="flex items-center px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl font-medium transition-all duration-300 hover-lift">
+            <i class="fas fa-download mr-2"></i>Export CSV
+          </button>
+          <div class="flex space-x-2">
+            <button class="filter-btn px-4 py-2 bg-red-200 text-white rounded-xl hover:bg-red-300" data-period="today">Today</button>
+            <button class="filter-btn px-4 py-2 bg-red-200 text-white rounded-xl hover:bg-red-300" data-period="week">This Week</button>
+            <button class="filter-btn px-4 py-2 bg-red-200 text-white rounded-xl hover:bg-red-300" data-period="all">Overall</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flagged Loans Table -->
+    <div class="bg-white rounded-2xl p-6 shadow-2xl transform transition-transform duration-500 hover:scale-[1.02] animate-slide-up px-4 md:px-12">
+      <h3 class="text-xl font-semibold text-gray-800 mb-6">Flagged Loans</h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200" id="flaggedTable">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loan ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount (₹)</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prediction</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for loan in flagged_loans %}
+            {% set data = loan.parsed_data %}
+            <tr class="hover:bg-gray-100 transition duration-300 flagged-row" data-date="{{ loan.created_at.strftime('%Y-%m-%d') }}">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loop.index }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loan.id }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ data.business if data.business is defined else 'N/A' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ data.gross_amount_disbursed if data.gross_amount_disbursed is defined else 'N/A' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ loan.result }} ({{ '%.2f' % loan.score if loan.score is not none else 'N/A' }})</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ loan.created_at.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function filterFlagged(period) {
+        const rows = document.querySelectorAll('.flagged-row');
+        const today = new Date();
+        const weekAgo = new Date();
+        weekAgo.setDate(today.getDate() - 7);
+
+        rows.forEach(row => {
+            const rowDateStr = row.getAttribute('data-date');
+            if(!rowDateStr) return;
+            const rowDate = new Date(rowDateStr + 'T00:00:00');
+
+            if(period === 'today') {
+                row.style.display = rowDate.toDateString() === today.toDateString() ? '' : 'none';
+            } else if(period === 'week') {
+                row.style.display = rowDate >= weekAgo ? '' : 'none';
+            } else { // all
+                row.style.display = '';
+            }
+        });
+    }
+
+    // Attach click listeners to filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const period = btn.getAttribute('data-period');
+            filterFlagged(period);
+        });
+    });
+
+    // CSV Export
+    document.getElementById('exportBtn').addEventListener('click', function () {
+        const rows = document.querySelectorAll('.flagged-row');
+        const visibleRows = Array.from(rows).filter(r => r.style.display !== 'none');
+
+        const csvContent = "data:text/csv;charset=utf-8,Loan ID,Business,Amount,Prediction,Date\n" +
+            visibleRows.map(row => {
+                const cells = row.querySelectorAll('td');
+                return Array.from(cells).slice(1).map(c => c.textContent).join(',');
+            }).join('\n');
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', 'flagged_loans.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+});
+</script>
+{% endblock %}
