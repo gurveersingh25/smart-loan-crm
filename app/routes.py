@@ -12,6 +12,7 @@ import json
 from collections import defaultdict
 from datetime import datetime
 from datetime import datetime, timedelta
+from app.utils_ai import get_ai_answer
 
 def get_encoder_choices(column_name):
     if column_name not in model_encoders:
