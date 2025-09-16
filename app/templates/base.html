@@ -103,6 +103,88 @@
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
+
+        @keyframes floaty {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+        
+        .chat-toggle {
+            animation: floaty 3s ease-in-out infinite;
+        }
+        /* Floating AI Assistant */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .chat-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .chat-toggle:hover {
+            transform: scale(1.1);
+        }
+        .chat-box {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 320px;
+            max-height: 450px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .chat-box.open {
+            display: flex;
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            font-weight: 600;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        .chat-input {
+            border-top: 1px solid #eee;
+            display: flex;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+        .chat-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            cursor: pointer;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -255,17 +337,122 @@
         </div>
     </footer>
 
+
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/interactions.js') }}"></script>
     
     <script>
-        // Mobile menu toggle
         document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
             const menu = document.querySelector('.mobile-menu');
             menu.classList.toggle('hidden');
         });
+
+        function toggleChat() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(event) {
+            const chatBox = document.getElementById('chatBox');
+            const toggleBtn = document.querySelector('.chat-toggle');
+            if (chatBox.classList.contains('open')) {
+                if (!chatBox.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    chatBox.classList.remove('open');
+                }
+            }
+        });
+
+        // Fast typewriter effect
+        function typeWriterEffect(container, htmlContent, delay = 20) {
+            container.innerHTML = ""; // clear container
+
+            // Create a temporary div to parse HTML
+            const temp = document.createElement('div');
+            temp.innerHTML = htmlContent;
+            const child = temp.firstElementChild;
+
+            if (!child) {
+                container.innerHTML = htmlContent;
+                return;
+            }
+
+            container.appendChild(child);
+            const text = child.textContent;
+            child.textContent = ""; // clear text for typing
+
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    child.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, delay);
+                }
+            }
+            type();
+        }
     </script>
-    
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+
+    <!-- Floating AI Assistant -->
+    <div class="chat-widget">
+        <div class="chat-toggle" onclick="toggleChat()">
+            <i class="fas fa-robot text-3xl"></i>
+        </div>
+        <div class="chat-box" id="chatBox">
+            <div class="chat-header flex items-center gap-2 p-2 bg-white shadow-sm">
+                <img src="/static/images/images.jpg" alt="AI Logo" class="w-10 h-10 rounded-full shadow-lg border border-gray-200">
+                <span class="font-semibold text-gray-700">AI Assistant</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <p class="text-gray-600">👋 Hi officer, how can I help you today?</p>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Ask me anything..." />
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currentLoanId = {{ loan.id if loan else 'null' }};
+        const input = document.getElementById('chatInput');
+
+        async function sendMessage() {
+            const messages = document.getElementById('chatMessages');
+            const msg = input.value.trim();
+            if (msg === '') return;
+
+            const userMsg = document.createElement('div');
+            userMsg.className = 'text-right mb-2';
+            userMsg.innerHTML = `<span class="inline-block bg-blue-100 text-blue-800 px-3 py-2 rounded-lg">${msg}</span>`;
+            messages.appendChild(userMsg);
+            messages.scrollTop = messages.scrollHeight;
+            input.value = '';
+
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'text-left mb-2';
+            aiMsg.innerHTML = `<span class="inline-block bg-gray-100 text-gray-800 px-3 py-2 rounded-lg">Processing...</span>`;
+            messages.appendChild(aiMsg);
+            messages.scrollTop = messages.scrollHeight;
+
+            try {
+                const res = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, loan_id: currentLoanId })
+                });
+                const data = await res.json();
+                typeWriterEffect(aiMsg, `<span class="inline-block bg-gray-100 text-gray-800 px-3 py-2 rounded-lg">${data.answer}</span>`, 20);
+                messages.scrollTop = messages.scrollHeight;
+            } catch (err) {
+                aiMsg.innerHTML = `<span class="inline-block bg-red-100 text-red-800 px-3 py-2 rounded-lg">Error: ${err.message}</span>`;
+            }
+        }
+
+        // Attach Enter key listener outside of sendMessage
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
