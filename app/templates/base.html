@@ -33,158 +33,28 @@
     
     <style>
         body { font-family: 'Inter', sans-serif; }
-        
-        .glass-morphism {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-        
-        .navbar-glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .tooltip-custom {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            z-index: 1000;
-            opacity: 0;
-            transform: translateY(5px);
-            transition: all 0.15s ease;
-            pointer-events: none;
-        }
-        
-        .tooltip-custom.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .btn-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-gradient:hover {
-            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        .page-loading {
-            overflow: hidden;
-        }
-        
-        .page-loading::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            z-index: 9999;
-            animation: loading-bar 1s linear infinite;
-        }
-        
-        @keyframes loading-bar {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        @keyframes floaty {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-12px);
-            }
-        }
-        
-        .chat-toggle {
-            animation: floaty 3s ease-in-out infinite;
-        }
-        /* Floating AI Assistant */
-        .chat-widget {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-        .chat-toggle {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 50%;
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-        .chat-toggle:hover {
-            transform: scale(1.1);
-        }
-        .chat-box {
-            display: none;
-            flex-direction: column;
-            position: absolute;
-            bottom: 80px;
-            right: 0;
-            width: 320px;
-            max-height: 450px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        .chat-box.open {
-            display: flex;
-        }
-        .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 16px;
-            font-weight: 600;
-        }
-        .chat-messages {
-            flex: 1;
-            padding: 12px;
-            overflow-y: auto;
-            font-size: 14px;
-        }
-        .chat-input {
-            border-top: 1px solid #eee;
-            display: flex;
-        }
-        .chat-input input {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            outline: none;
-            font-size: 14px;
-        }
-        .chat-input button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 0 16px;
-            cursor: pointer;
-        }
+        .glass-morphism { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18); }
+        .navbar-glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+        .tooltip-custom { position: absolute; background: rgba(0, 0, 0, 0.9); color: white; padding: 8px 12px; border-radius: 6px; font-size: 14px; z-index: 1000; opacity: 0; transform: translateY(5px); transition: all 0.15s ease; pointer-events: none; }
+        .tooltip-custom.show { opacity: 1; transform: translateY(0); }
+        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .btn-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s ease; }
+        .btn-gradient:hover { background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3); }
+        .page-loading { overflow: hidden; }
+        .page-loading::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); z-index: 9999; animation: loading-bar 1s linear infinite; }
+        @keyframes loading-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .chat-toggle { animation: floaty 3s ease-in-out infinite; }
+        .chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .chat-toggle { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: transform 0.3s ease; }
+        .chat-toggle:hover { transform: scale(1.1); }
+        .chat-box { display: none; flex-direction: column; position: absolute; bottom: 80px; right: 0; width: 320px; max-height: 450px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; }
+        .chat-box.open { display: flex; }
+        .chat-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 16px; font-weight: 600; }
+        .chat-messages { flex: 1; padding: 12px; overflow-y: auto; font-size: 14px; }
+        .chat-input { border-top: 1px solid #eee; display: flex; }
+        .chat-input input { flex: 1; padding: 10px; border: none; outline: none; font-size: 14px; }
+        .chat-input button { background: #667eea; color: white; border: none; padding: 0 16px; cursor: pointer; }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -337,7 +207,6 @@
         </div>
     </footer>
 
-
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/interactions.js') }}"></script>
     
@@ -362,28 +231,15 @@
             }
         });
 
-        // Fast typewriter effect
         function typeWriterEffect(container, htmlContent, delay = 20) {
-            container.innerHTML = ""; // clear container
-
-            // Create a temporary div to parse HTML
+            container.innerHTML = ""; 
             const temp = document.createElement('div');
             temp.innerHTML = htmlContent;
-            const child = temp.firstElementChild;
-
-            if (!child) {
-                container.innerHTML = htmlContent;
-                return;
-            }
-
-            container.appendChild(child);
-            const text = child.textContent;
-            child.textContent = ""; // clear text for typing
-
+            const text = temp.textContent || temp.innerText || "";
             let i = 0;
             function type() {
                 if (i < text.length) {
-                    child.textContent += text.charAt(i);
+                    container.textContent += text.charAt(i);
                     i++;
                     setTimeout(type, delay);
                 }
@@ -399,7 +255,7 @@
         </div>
         <div class="chat-box" id="chatBox">
             <div class="chat-header flex items-center gap-2 p-2 bg-white shadow-sm">
-                <img src="/static/images/images.jpg" alt="AI Logo" class="w-10 h-10 rounded-full shadow-lg border border-gray-200">
+                <img src="{{ url_for('static', filename='images/images.jpg') }}" alt="AI Logo" class="w-10 h-10 rounded-full shadow-lg border border-gray-200">
                 <span class="font-semibold text-gray-700">AI Assistant</span>
             </div>
             <div class="chat-messages" id="chatMessages">
@@ -413,7 +269,7 @@
     </div>
 
     <script>
-        const currentLoanId = {{ loan.id if loan else 'null' }};
+        const currentLoanId = {{ loan.id if loan else 'null' }}; // Safe Jinja rendering
         const input = document.getElementById('chatInput');
 
         async function sendMessage() {
@@ -441,14 +297,13 @@
                     body: JSON.stringify({ message: msg, loan_id: currentLoanId })
                 });
                 const data = await res.json();
-                typeWriterEffect(aiMsg, `<span class="inline-block bg-gray-100 text-gray-800 px-3 py-2 rounded-lg">${data.answer}</span>`, 20);
+                typeWriterEffect(aiMsg, data.answer || "No answer received", 20);
                 messages.scrollTop = messages.scrollHeight;
             } catch (err) {
                 aiMsg.innerHTML = `<span class="inline-block bg-red-100 text-red-800 px-3 py-2 rounded-lg">Error: ${err.message}</span>`;
             }
         }
 
-        // Attach Enter key listener outside of sendMessage
         input.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -456,3 +311,5 @@
             }
         });
     </script>
+</body>
+</html>
