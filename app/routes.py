@@ -349,6 +349,22 @@ def delete_user(user_id):
     return redirect(url_for('routes.admin_dashboard'))
 
 
+
+@bp.route('/api/ai/chat', methods=['POST'])
+@login_required
+def ai_chat():
+    data = request.get_json()
+    if not data or 'message' not in data:
+        return jsonify({'answer':'No message sent'}), 400
+
+    user_message = data['message']
+    loan_id = data.get('loan_id')
+    loan = Loan.query.get(loan_id) if loan_id else Loan.query.filter_by(officer_id=current_user.id).order_by(Loan.id.desc()).first()
+
+    answer = get_ai_answer(user_message=user_message, loan=loan, officer=current_user)
+    return jsonify({'answer': answer})
+
+
 @bp.errorhandler(403)
 def forbidden(e):
     return render_template('403.html'), 403
