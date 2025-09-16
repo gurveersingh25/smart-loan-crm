@@ -216,8 +216,8 @@ def prediction_history():
 @bp.route('/flagged-loans')
 @login_required
 def flagged_loans_view():
-    last_loan = Loan.query.filter_by(officer_id=current_user.id)\
-                      .order_by(Loan.id.desc()).first()
+    #last_loan = Loan.query.filter_by(officer_id=current_user.id)\
+     #                 .order_by(Loan.id.desc()).first()
     today = datetime.today()
     week_ago = today - timedelta(days=7)
 
@@ -257,8 +257,7 @@ def flagged_loans_view():
         flagged_loans=flagged_loans,
         flagged_count=flagged_count,
         flagged_today=flagged_today,
-        flagged_week=flagged_week,
-        loan=last_loan
+        flagged_week=flagged_week
     )
 
 
