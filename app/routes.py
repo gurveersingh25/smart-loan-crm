@@ -9,7 +9,7 @@ from app.ml_model.predict import predict_loan_default, get_model
 from app.ml_model.utils import decode_value
 import json
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def get_encoder_choices(column_name):
