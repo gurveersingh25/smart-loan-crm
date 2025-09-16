@@ -268,7 +268,18 @@
         </div>
     </div>
 
-    <script>
+   <script>
+    const input = document.getElementById('chatInput'); // top-level reference
+
+    // Add Enter key support
+    input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendMessage(); // call the separate function
+        }
+    });
+
+    // sendMessage function
     async function sendMessage() {
         const messages = document.getElementById('chatMessages');
         const msg = input.value.trim();
@@ -296,9 +307,8 @@
 
             let data;
             try {
-                data = await res.json(); // try parsing JSON
+                data = await res.json();
             } catch (jsonErr) {
-                // fallback for HTML or invalid response
                 data = { answer: `Error: Unexpected response from server (${res.status})` };
             }
 
