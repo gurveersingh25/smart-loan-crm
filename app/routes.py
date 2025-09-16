@@ -2,18 +2,18 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from app import db
-from .models import User, Prediction
+from .models import User, Prediction, Loan 
 from .forms import LoginForm, RegisterForm, PredictionForm
 import random
-from app.ml_model.predict import predict_loan_default, get_model 
+from app.ml_model.predict import model_encoders, feature_order
+from app.ml_model.predict import predict_loan_default
 from app.ml_model.utils import decode_value
 import json
 from collections import defaultdict
+from datetime import datetime
 from datetime import datetime, timedelta
 
-
 def get_encoder_choices(column_name):
-    _, model_encoders, _ = get_model()  
     if column_name not in model_encoders:
         return []
     encoder = model_encoders[column_name]
@@ -27,7 +27,7 @@ bp = Blueprint('routes', __name__)
 
 @bp.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', loan=None)
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -93,11 +93,16 @@ def user_dashboard():
     total_predictions = len(user_predictions)
     likely_default = sum(1 for p in user_predictions if p.result.lower() == 'likely to default')
     not_likely_default = sum(1 for p in user_predictions if p.result.lower() == 'not likely to default')
+
+    # ⚡ Fetch the latest loan for AI chat
+    loan = Loan.query.filter_by(officer_id=current_user.id).order_by(Loan.id.desc()).first()
+
     return render_template(
         'user_dashboard.html',
         total_predictions=total_predictions,
         not_likely_default=not_likely_default,
-        likely_default=likely_default
+        likely_default=likely_default,
+        loan=loan  # <<< pass loan object for AI chat
     )
 
 
@@ -127,6 +132,7 @@ def predict_loan():
 
     prediction = None
     decoded_inputs = None
+    last_loan = None  # <<< variable to hold last loan
 
     if request.method == "POST":
         print("✅ POST Request Received")
@@ -134,13 +140,12 @@ def predict_loan():
         if form.validate_on_submit():
             print("✅ Form validated successfully")
 
-            _, _, feature_order = get_model()  # ✅ load feature order lazily
             input_data = {
                 field.name: field.data
                 for field in form if field.name in feature_order and field.data is not None
             }
 
-            result, score, decoded_inputs = predict_loan_default(input_data)
+            result, score, decoded_inputs, X_input_decoded = predict_loan_default(input_data)
 
             pred = Prediction(
                 user_id=current_user.id,
@@ -151,16 +156,50 @@ def predict_loan():
             db.session.add(pred)
             db.session.commit()
 
+            # ✅ Create Loan entry tied to prediction
+            loan = Loan(
+                officer_id=current_user.id,
+                business=decoded_inputs.get('business'),
+                jobs_reatained=decoded_inputs.get('jobs_reatained'),
+                jobs_created=decoded_inputs.get('jobs_created'),
+                guaranteed_approved__loan=decoded_inputs.get('guaranteed_approved__loan'),
+                low_documentation_loan=decoded_inputs.get('low_documentation_loan'),
+                demography=decoded_inputs.get('demography'),
+                state_of_bank=decoded_inputs.get('state_of_bank'),
+                chargedoff_amount=decoded_inputs.get('chargedoff_amount'),
+                borrower_city=decoded_inputs.get('borrower_city'),
+                borrower_state=decoded_inputs.get('borrower_state'),
+                gross_amount_balance=decoded_inputs.get('gross_amount_balance'),
+                count_employees=decoded_inputs.get('count_employees'),
+                classification_code=decoded_inputs.get('classification_code'),
+                loan_approved_gross=decoded_inputs.get('loan_approved_gross'),
+                gross_amount_disbursed=decoded_inputs.get('gross_amount_disbursed'),
+                loan_term=decoded_inputs.get('loan_term'),
+                code_franchise=decoded_inputs.get('code_franchise'),
+                name_of_bank=decoded_inputs.get('name_of_bank'),
+                revolving_credit_line=decoded_inputs.get('revolving_credit_line'),
+                prediction=result
+            )
+            db.session.add(loan)
+            db.session.commit()
+            last_loan = loan
+
             prediction = f"{result} (Score: {score:.2f})"
             flash(f'Prediction completed: {prediction}', 'info')
+
         else:
             print("❌ Form validation failed:", form.errors)
+
+    # On GET, set last_loan to last prediction's loan if exists
+    if last_loan is None:
+        last_loan = Loan.query.order_by(Loan.id.desc()).filter_by(officer_id=current_user.id).first()
 
     return render_template(
         'predict.html',
         form=form,
         prediction=prediction,
-        decoded_inputs=decoded_inputs
+        decoded_inputs=decoded_inputs,
+        loan=last_loan  # pass loan to template for AI chat
     )
 
 
@@ -168,31 +207,38 @@ def predict_loan():
 @login_required
 def prediction_history():
     predictions = Prediction.query.filter_by(user_id=current_user.id).order_by(Prediction.created_at.desc()).all()
-    return render_template('prediction_history.html', predictions=predictions)
+    last_loan = Loan.query.filter_by(officer_id=current_user.id)\
+                      .order_by(Loan.id.desc()).first()
+    return render_template('prediction_history.html', predictions=predictions,loan=last_loan)
 
 
 @bp.route('/flagged-loans')
 @login_required
 def flagged_loans_view():
+    last_loan = Loan.query.filter_by(officer_id=current_user.id)\
+                      .order_by(Loan.id.desc()).first()
     today = datetime.today()
     week_ago = today - timedelta(days=7)
 
-    
+    # Flagged = result "Likely to Default"
+    #flagged_loans = Prediction.query.filter_by(result="Likely to Default").all()
     flagged_loans = Prediction.query.filter_by(
         result="Likely to Default",
-        user_id=current_user.id  
+        user_id=current_user.id  # <-- filter by officer
     ).all()
-    for loan in flagged_loans:
 
+    for loan in flagged_loans:
+        # Parse input data safely
         try:
             loan.parsed_data = json.loads(loan.input_data)
         except Exception:
             loan.parsed_data = {}
 
-        
+        # Ensure created_at is always valid for JS filters
         if not loan.created_at:
             loan.created_at = datetime.utcnow()
 
+    # Stats
     flagged_count = len(flagged_loans)
     flagged_today = (
         Prediction.query.filter_by(result="Likely to Default")
@@ -210,13 +256,23 @@ def flagged_loans_view():
         flagged_loans=flagged_loans,
         flagged_count=flagged_count,
         flagged_today=flagged_today,
-        flagged_week=flagged_week
+        flagged_week=flagged_week,
+        loan=last_loan
     )
+
+
+
+
+
+
+
 
 
 @bp.route('/crm')
 @login_required
 def crm_view():
+    last_loan = Loan.query.filter_by(officer_id=current_user.id)\
+                      .order_by(Loan.id.desc()).first()
     user_predictions = Prediction.query.filter_by(user_id=current_user.id).all()
 
     total_predictions = len(user_predictions)
@@ -252,7 +308,8 @@ def crm_view():
         chart_values=chart_values,
         trend_dates=trend_dates,
         trend_defaults=trend_defaults,
-        trend_nondefaults=trend_nondefaults
+        trend_nondefaults=trend_nondefaults,
+        loan=last_loan
     )
 
 
