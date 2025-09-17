@@ -26,7 +26,7 @@ def get_ai_answer(user_message, loan, officer):
 
 
     if hasattr(officer, "role") and officer.role == "admin":
-    return (f"Hello {officer.username}, I see you are logged in as an Admin. "
+        return (f"Hello {officer.username}, I see you are logged in as an Admin. "
             "This AI assistant is currently tailored for Loan Officers to manage borrower and loan insights. "
             "For administrative access to this service, please contact the developer, Gurveer Singh.")
     
@@ -249,4 +249,5 @@ def get_ai_answer(user_message, loan, officer):
 
     return ("I'm here to answer questions about loans, borrower info, default risk, "
             "your prediction stats, and recommendations. Can you clarify or ask something specific?")
+
 
