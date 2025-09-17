@@ -356,7 +356,7 @@ def ai_chat():
     try:
         data = request.get_json()
         if not data or 'message' not in data:
-            return jsonify({'answer':'No message sent'}), 400
+            return jsonify({'answer': 'No message sent'}), 400
 
         user_message = data['message']
         loan_id = data.get('loan_id')
@@ -364,10 +364,16 @@ def ai_chat():
         # Officer is current_user if logged in, otherwise None
         officer = current_user if current_user.is_authenticated else None
 
-        # Loan only makes sense if logged in
+        # Clean up loan_id to avoid "null"/"undefined"/empty string issues
+        if loan_id in [None, "", "null", "None", "undefined"]:
+            loan_id = None
+
         loan = None
-        if officer and loan_id:
-            loan = Loan.query.get(loan_id)
+        if officer and loan_id is not None:
+            try:
+                loan = Loan.query.get(int(loan_id))
+            except ValueError:
+                loan = None
         elif officer:
             loan = Loan.query.filter_by(officer_id=officer.id).order_by(Loan.id.desc()).first()
 
@@ -376,6 +382,7 @@ def ai_chat():
 
     except Exception as e:
         return jsonify({'answer': f'Error processing request: {str(e)}'}), 500
+
 
 
 
