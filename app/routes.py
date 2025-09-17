@@ -217,7 +217,7 @@ def prediction_history():
 @login_required
 def flagged_loans_view():
     last_loan = Loan.query.filter_by(officer_id=current_user.id)\
-                         .order_by(Loan.id.desc()).first()
+                      .order_by(Loan.id.desc()).first()
     today = datetime.today()
     week_ago = today - timedelta(days=7)
 
