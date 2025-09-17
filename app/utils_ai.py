@@ -23,6 +23,12 @@ def get_ai_answer(user_message, loan, officer):
     if officer is None:
         return ("👋 Hey there! I’m your AI Loan Assistant. "
                 "Sign in to interact with me, loans, borrowers, and predictions.")
+
+
+    if hasattr(officer, "role") and officer.role == "admin":
+    return (f"Hello {officer.username}, I see you are logged in as an Admin. "
+            "This AI assistant is currently tailored for Loan Officers to manage borrower and loan insights. "
+            "For administrative access to this service, please contact the developer, Gurveer Singh.")
     
     # --- Friendly / conversational responses ---
     if re.search(r'\b(hello|hi|hey)\b', msg):
@@ -243,3 +249,4 @@ def get_ai_answer(user_message, loan, officer):
 
     return ("I'm here to answer questions about loans, borrower info, default risk, "
             "your prediction stats, and recommendations. Can you clarify or ask something specific?")
+
